@@ -40,20 +40,48 @@
     revealables.forEach((el) => el.classList.add("visible"));
   }
 
-  // ---------- Email capture (stub — wire to a real endpoint later) ----------
+  // ---------- Email capture ----------
+  // Formspree endpoint, e.g. "https://formspree.io/f/xanyzabc".
+  // Leave empty to fall back to demo mode (shows success without sending).
+  const SIGNUP_ENDPOINT = "";
+
   const form = document.getElementById("signup-form");
   const msg = document.getElementById("form-msg");
   if (form && msg) {
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = form.email.value.trim();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         msg.textContent = "Hmm, that doesn't look like an email — try again?";
         return;
       }
-      // TODO: POST to your email list provider (e.g. Buttondown, Mailchimp, ConvertKit)
-      form.style.display = "none";
-      msg.textContent = "You're on the list! We'll boop you exactly once, at launch. ✓";
+
+      const success = () => {
+        form.style.display = "none";
+        msg.textContent = "You're on the list! We'll boop you exactly once, at launch. ✓";
+      };
+
+      if (!SIGNUP_ENDPOINT) {
+        success(); // demo mode
+        return;
+      }
+
+      const button = form.querySelector("button");
+      button.disabled = true;
+      button.textContent = "Joining…";
+      try {
+        const res = await fetch(SIGNUP_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ email, source: "landing-early-access" }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        success();
+      } catch (err) {
+        msg.textContent = "Something went wrong — please try again in a minute.";
+        button.disabled = false;
+        button.textContent = "Get early access";
+      }
     });
   }
 
