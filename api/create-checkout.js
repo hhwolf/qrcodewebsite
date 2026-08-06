@@ -7,9 +7,9 @@
 const UNIT_AMOUNT = 2999; // cents
 const BUNDLE_SIZE = 4;
 const BUNDLE_AMOUNT = 9999; // cents, per 4-pack
-const FORMATS = ["card", "sticker", "tent", "five7"];
+const FORMATS = ["card", "sticker", "five7"];
 const FORMAT_LABELS = {
-  card: "Card", sticker: "Sticker", tent: "Table tent", five7: "5×7 counter display",
+  card: "Card", sticker: "Sticker", five7: "5×7 counter display (framed)",
 };
 const USECASE_LABELS = {
   menu: "Menu", wifi: "Wi-Fi", pay: "Pay / tips", bizcard: "Business card",
@@ -23,16 +23,38 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { format, usecase, qty, design } = req.body || {};
-  if (!FORMATS.includes(format)) return res.status(400).json({ error: "Unknown format" });
+  // Accept a pack of designs ({items: [...]}) or a legacy single design.
+  const body = req.body || {};
+  const rawItems = Array.isArray(body.items)
+    ? body.items
+    : [{ format: body.format, usecase: body.usecase, qty: body.qty, design: body.design }];
 
-  const quantity = Math.min(500, Math.max(1, parseInt(qty, 10) || 1));
+  const items = rawItems
+    .filter((i) => i && FORMATS.includes(i.format))
+    .map((i) => ({
+      format: i.format,
+      usecase: i.usecase,
+      qty: Math.min(500, Math.max(1, parseInt(i.qty, 10) || 1)),
+      design: i.design || {},
+    }))
+    .slice(0, 50);
+  if (!items.length) return res.status(400).json({ error: "No valid items" });
+
+  const quantity = Math.min(500, items.reduce((sum, i) => sum + i.qty, 0));
   const bundles = Math.floor(quantity / BUNDLE_SIZE);
   const singles = quantity % BUNDLE_SIZE;
-  const name = `boop ${FORMAT_LABELS[format]} — ${USECASE_LABELS[usecase] || "Custom"}`;
+  const first = items[0];
+  const name =
+    items.length === 1
+      ? `boop ${FORMAT_LABELS[first.format]} — ${USECASE_LABELS[first.usecase] || "Custom"}`
+      : `boop tags — ${items.length} designs, mix & match`;
 
   const origin = `https://${req.headers["x-forwarded-host"] || req.headers.host}`;
-  const d = design || {};
+  const d = first.design;
+  const designSummary = items
+    .map((i) => `${i.qty}× ${FORMAT_LABELS[i.format]}/${USECASE_LABELS[i.usecase] || "Custom"} (${(i.design.name || "").slice(0, 30)})`)
+    .join("; ")
+    .slice(0, 480);
 
   const params = new URLSearchParams({
     mode: "payment",
@@ -49,8 +71,9 @@ export default async function handler(req, res) {
     "shipping_options[1][shipping_rate_data][fixed_amount][amount]": "0",
     "shipping_options[1][shipping_rate_data][fixed_amount][currency]": "usd",
     // Design spec lands on the payment in the Stripe dashboard for fulfillment.
-    "metadata[format]": meta(format),
-    "metadata[usecase]": meta(usecase),
+    "metadata[designs]": designSummary,
+    "metadata[format]": meta(first.format),
+    "metadata[usecase]": meta(first.usecase),
     "metadata[business_name]": meta(d.name),
     "metadata[headline]": meta(d.callout),
     "metadata[bg_color]": meta(d.bg),

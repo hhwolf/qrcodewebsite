@@ -38,7 +38,7 @@
   };
 
   const LABELS = {
-    format: { card: "Card", sticker: "Sticker", tent: "Table tent", five7: "5×7 card" },
+    format: { card: "Card", sticker: "Sticker", five7: "5×7 display" },
     usecase: {
       menu: "Menu", wifi: "Wi-Fi", pay: "Pay / tips", bizcard: "Business card",
       review: "Google review", instagram: "Instagram", custom: "Custom link",
@@ -77,7 +77,7 @@
   // ---------- Templates: curated two-sided starting points ----------
   // bg/accent flow through the "custom" color slot so every template
   // stays fully editable. `back` designs the reverse side of cards and
-  // tents; stickers are single-sided, so their templates have no back.
+  // 5×7 displays; stickers are single-sided, so their templates have no back.
   const TEMPLATES = [
     // --- 5×7 counter displays (framed poster layout with QR + tap panel) ---
     {
@@ -110,12 +110,6 @@
     },
 
     // --- Tags & stickers ---
-    {
-      key: "bistro", label: "The Bistro", desc: "A menu on every table, updated from your phone.",
-      thumbName: "Café Norte",
-      format: "tent", usecase: "menu", bg: "#FAF3E7", accent: "#C4532D", style: "band",
-      back: { mode: "qr-text", text: "Scan for today's menu" },
-    },
     {
       key: "tipjar", label: "The Tip Jar", desc: "Cash-free tips for counters, cases, and stages.",
       thumbName: "Tips for Alex", callout: "Tap to tip",
@@ -270,6 +264,7 @@
     const parts = [LABELS.format[state.format], LABELS.usecase[state.usecase], colorLabel];
     if (state.templateLabel) parts.unshift(state.templateLabel);
     if (isSingleSided()) parts.push("single-sided");
+    if (state.format === "five7") parts.push("wooden frame included");
     caption.textContent = parts.join(" · ");
   }
 
@@ -557,12 +552,12 @@
     document.querySelector(".options-panel").scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  // ---------- Continue to checkout ----------
-  const form = document.getElementById("order-form");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
+  // ---------- Pack (cart) & checkout ----------
+  const packMsg = document.getElementById("pack-msg");
+
+  function buildOrder() {
     const bg = resolveColor();
-    const order = {
+    return {
       format: state.format,
       formatLabel: LABELS.format[state.format],
       usecase: state.usecase,
@@ -583,15 +578,63 @@
       posterLabel: (POSTER[state.usecase] || POSTER.custom).label,
       posterSub: (POSTER[state.usecase] || POSTER.custom).sub,
       scanLabel: (POSTER[state.usecase] || POSTER.custom).scan,
+      qty: 1,
     };
+  }
+
+  function loadCart() {
     try {
-      localStorage.setItem("boopOrder", JSON.stringify(order));
+      return JSON.parse(localStorage.getItem("boopCart")) || [];
     } catch (err) {
-      // A large logo data URL can exceed the storage quota — drop it and keep going.
-      localStorage.setItem("boopOrder", JSON.stringify({ ...order, logo: null }));
+      return [];
     }
+  }
+
+  function saveCart(cart) {
+    try {
+      localStorage.setItem("boopCart", JSON.stringify(cart));
+    } catch (err) {
+      // Large logo data URLs can blow the storage quota — drop them and keep going.
+      localStorage.setItem("boopCart", JSON.stringify(cart.map((i) => ({ ...i, logo: null }))));
+    }
+  }
+
+  // Guard so "Add" then "Continue" doesn't count the same design twice.
+  const designKey = (o) => JSON.stringify({ ...o, qty: 1 });
+  let lastAddedKey = null;
+
+  document.getElementById("add-pack").addEventListener("click", () => {
+    const order = buildOrder();
+    const key = designKey(order);
+    if (key === lastAddedKey) {
+      packMsg.textContent = "This design is already in your pack — change something to add another.";
+      return;
+    }
+    const cart = loadCart();
+    cart.push(order);
+    saveCart(cart);
+    lastAddedKey = key;
+    packMsg.textContent = `Added ✓ — ${cart.length} design${cart.length === 1 ? "" : "s"} in your pack. Tweak the design for your next tag, or continue to checkout.`;
+  });
+
+  const form = document.getElementById("order-form");
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const order = buildOrder();
+    const cart = loadCart();
+    if (designKey(order) !== lastAddedKey) cart.push(order);
+    saveCart(cart);
     window.location.href = "/checkout";
   });
+
+  // Landing "4-Pack" CTA arrives as /customize?pack=4 — remember the size
+  // for checkout, then clean the URL.
+  const packParam = new URLSearchParams(window.location.search).get("pack");
+  if (packParam) {
+    sessionStorage.setItem("boopPackHint", packParam);
+    history.replaceState(null, "", window.location.pathname);
+    packMsg.textContent = "Building a 4-pack: design your first tag, then “Add & design another” for the rest — or order 4 of one design at checkout.";
+  }
 
   updateBackAvailability();
   render();

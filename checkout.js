@@ -1,4 +1,4 @@
-// boop. checkout — renders the saved design, prices the order, stub payment
+// boop. checkout — renders the pack of designs, prices the order, Stripe payment
 
 (function () {
   "use strict";
@@ -7,26 +7,52 @@
   const content = document.getElementById("co-content");
   if (!content) return; // not on the checkout page
 
-  let order = null;
-  try {
-    order = JSON.parse(localStorage.getItem("boopOrder"));
-  } catch (err) {
-    order = null;
+  // ---------- Load the pack ----------
+  function loadCart() {
+    try {
+      const cart = JSON.parse(localStorage.getItem("boopCart"));
+      if (Array.isArray(cart) && cart.length) return cart;
+    } catch (err) { /* fall through */ }
+    try {
+      // Older sessions stored a single design under boopOrder.
+      const single = JSON.parse(localStorage.getItem("boopOrder"));
+      if (single && single.format) return [{ ...single, qty: 1 }];
+    } catch (err) { /* fall through */ }
+    return [];
   }
-  if (!order || !order.format) {
+
+  function saveCart() {
+    try {
+      localStorage.setItem("boopCart", JSON.stringify(cart));
+    } catch (err) {
+      localStorage.setItem("boopCart", JSON.stringify(cart.map((i) => ({ ...i, logo: null }))));
+    }
+  }
+
+  const cart = loadCart();
+  if (!cart.length) {
     empty.hidden = false;
     return;
   }
   content.hidden = false;
 
+  // Landing 4-Pack CTA: if they came for a 4-pack and only made one design,
+  // default its quantity to 4.
+  const packHint = parseInt(sessionStorage.getItem("boopPackHint"), 10);
+  sessionStorage.removeItem("boopPackHint");
+  if (packHint > 1 && cart.length === 1 && (cart[0].qty || 1) === 1) {
+    cart[0].qty = packHint;
+    saveCart();
+  }
+  cart.forEach((i) => { i.qty = Math.min(500, Math.max(1, parseInt(i.qty, 10) || 1)); });
+
   // $29.99 per tag (tax included); every 4 tags bundle to $99.99.
   // Cents math to avoid float drift. Must match api/create-checkout.js,
-  // which prices the real charge.
+  // which prices the real charge. Shipping ($10 or free pickup) is chosen
+  // on Stripe's page, so totals here are pre-shipping.
   const UNIT_C = 2999;
   const BUNDLE_SIZE = 4;
   const BUNDLE_C = 9999;
-  // Shipping ($10 standard or free pickup) is chosen on Stripe's page,
-  // so totals here are pre-shipping.
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, (c) => ({
@@ -34,7 +60,7 @@
     }[c]));
   }
 
-  // ---------- Design preview (same classes as the design studio) ----------
+  // ---------- Design previews (same classes as the design studio) ----------
   const QR_SVG_INNER = `<g fill="currentColor">
       <rect x="0" y="0" width="12" height="12" rx="2"/><rect x="3" y="3" width="6" height="6" class="qr-hole" rx="1"/>
       <rect x="28" y="0" width="12" height="12" rx="2"/><rect x="31" y="3" width="6" height="6" class="qr-hole" rx="1"/>
@@ -106,73 +132,117 @@
       </div>`;
   }
 
+  function itemTitle(o, idx) {
+    const bits = [o.formatLabel, o.usecaseLabel];
+    return `${idx + 1}. ${bits.join(" · ")}`;
+  }
+
+  function itemDetail(o) {
+    const bits = [o.colorLabel];
+    if (o.format === "five7") bits.push("wooden frame included");
+    else bits.push(o.singleSided ? "single-sided" : "two-sided");
+    if (o.name) bits.push(o.name);
+    return bits.join(" · ");
+  }
+
   const faces = document.getElementById("co-faces");
-  faces.innerHTML = `
-    <div class="co-face"><span class="co-face-label">Front</span>${frontFace(order)}</div>
-    ${order.singleSided ? "" : `<div class="co-face"><span class="co-face-label">Back</span>${backFace(order)}</div>`}`;
+  const packList = document.getElementById("pack-list");
 
-  // ---------- Spec list ----------
-  const backLabels = { "qr-text": "Big QR + text", qr: "QR only", blank: "Blank" };
-  const specs = [
-    ["Format", order.formatLabel],
-    ["Use case", order.usecaseLabel],
-    ["Front text", order.callout],
-    ["Color", order.colorLabel],
-    ["Back", order.singleSided ? "Single-sided" : backLabels[order.back] || order.back],
-    ["Name", order.name],
-    ["Logo", order.logo ? "Uploaded" : "None"],
-  ];
-  if (order.templateLabel) specs.unshift(["Template", order.templateLabel]);
-  document.getElementById("spec-list").innerHTML = specs
-    .map(([k, v]) => `<div class="spec-row"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`)
-    .join("");
+  function renderPack() {
+    faces.innerHTML = cart
+      .map(
+        (o, i) => `
+        <div class="co-design">
+          <p class="co-design-title">${esc(itemTitle(o, i))}</p>
+          <div class="co-face"><span class="co-face-label">Front</span>${frontFace(o)}</div>
+          ${o.singleSided ? "" : `<div class="co-face"><span class="co-face-label">Back</span>${backFace(o)}</div>`}
+        </div>`
+      )
+      .join("");
 
-  // ---------- Quantity & pricing ----------
-  const qtyInput = document.getElementById("qty");
-  const unitEl = document.getElementById("unit-price");
+    packList.innerHTML = cart
+      .map(
+        (o, i) => `
+        <div class="pack-row" data-i="${i}">
+          <div class="pack-row-info">
+            <strong>${esc(itemTitle(o, i))}</strong>
+            <span>${esc(itemDetail(o))}</span>
+          </div>
+          <div class="qty-row qty-row-compact">
+            <button type="button" class="qty-btn" data-act="minus" aria-label="Decrease quantity">−</button>
+            <input type="number" value="${o.qty}" min="1" max="500" inputmode="numeric" aria-label="Quantity for design ${i + 1}" />
+            <button type="button" class="qty-btn" data-act="plus" aria-label="Increase quantity">+</button>
+          </div>
+          <button type="button" class="pack-remove" data-act="remove" aria-label="Remove design ${i + 1}">✕</button>
+        </div>`
+      )
+      .join("");
+  }
+
+  packList.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-act]");
+    if (!btn) return;
+    const row = btn.closest(".pack-row");
+    const i = parseInt(row.dataset.i, 10);
+    if (btn.dataset.act === "remove") {
+      cart.splice(i, 1);
+      if (!cart.length) {
+        saveCart();
+        content.hidden = true;
+        empty.hidden = false;
+        return;
+      }
+      renderPack();
+    } else {
+      const delta = btn.dataset.act === "plus" ? 1 : -1;
+      cart[i].qty = Math.min(500, Math.max(1, cart[i].qty + delta));
+      row.querySelector("input").value = cart[i].qty;
+    }
+    saveCart();
+    updateTotals();
+  });
+
+  packList.addEventListener("change", (e) => {
+    const input = e.target.closest("input[type=number]");
+    if (!input) return;
+    const i = parseInt(input.closest(".pack-row").dataset.i, 10);
+    const n = parseInt(input.value, 10);
+    cart[i].qty = Math.min(500, Math.max(1, isNaN(n) ? 1 : n));
+    input.value = cart[i].qty;
+    saveCart();
+    updateTotals();
+  });
+
+  // ---------- Totals ----------
   const subtotalEl = document.getElementById("subtotal");
   const discountLine = document.getElementById("discount-line");
   const discountEl = document.getElementById("discount");
   const totalEl = document.getElementById("total");
+  const payBtn = document.getElementById("pay-btn");
 
   const fmt = (c) => `$${(c / 100).toFixed(2)}`;
-
-  function qty() {
-    const n = parseInt(qtyInput.value, 10);
-    return Math.min(500, Math.max(1, isNaN(n) ? 1 : n));
-  }
+  const totalTags = () => cart.reduce((sum, i) => sum + i.qty, 0);
 
   function updateTotals() {
-    const n = qty();
+    const n = totalTags();
     const bundles = Math.floor(n / BUNDLE_SIZE);
     const singles = n % BUNDLE_SIZE;
     const subtotal = UNIT_C * n;
     const itemsTotal = bundles * BUNDLE_C + singles * UNIT_C;
     const discount = subtotal - itemsTotal;
-    unitEl.textContent = `× ${fmt(UNIT_C)} each`;
-    subtotalEl.textContent = fmt(subtotal);
+    subtotalEl.textContent = `${fmt(subtotal)} (${n} tag${n === 1 ? "" : "s"})`;
     discountLine.hidden = discount === 0;
     discountEl.textContent = `−${fmt(discount)}`;
     totalEl.textContent = fmt(itemsTotal);
-    document.getElementById("pay-btn").textContent = `Pay with Stripe · ${fmt(itemsTotal)}`;
+    payBtn.textContent = `Pay with Stripe · ${fmt(itemsTotal)}`;
   }
 
-  qtyInput.addEventListener("input", updateTotals);
-  qtyInput.addEventListener("change", () => { qtyInput.value = qty(); updateTotals(); });
-  document.getElementById("qty-minus").addEventListener("click", () => {
-    qtyInput.value = Math.max(1, qty() - 1);
-    updateTotals();
-  });
-  document.getElementById("qty-plus").addEventListener("click", () => {
-    qtyInput.value = Math.min(500, qty() + 1);
-    updateTotals();
-  });
+  renderPack();
   updateTotals();
 
   // ---------- Stripe Checkout ----------
   const form = document.getElementById("pay-form");
   const msg = document.getElementById("pay-msg");
-  const payBtn = document.getElementById("pay-btn");
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -184,19 +254,21 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          format: order.format,
-          usecase: order.usecase,
-          qty: qty(),
-          design: {
-            name: order.name,
-            callout: order.callout,
-            bg: order.bg,
-            accent: order.accent,
-            style: order.style,
-            back: order.singleSided ? "single-sided" : order.back,
-            backCallout: order.backCallout,
-            hasLogo: Boolean(order.logo),
-          },
+          items: cart.map((o) => ({
+            format: o.format,
+            usecase: o.usecase,
+            qty: o.qty,
+            design: {
+              name: o.name,
+              callout: o.callout,
+              bg: o.bg,
+              accent: o.accent,
+              style: o.style,
+              back: o.singleSided ? "single-sided" : o.back,
+              backCallout: o.backCallout,
+              hasLogo: Boolean(o.logo),
+            },
+          })),
         }),
       });
       const data = await res.json();
@@ -212,16 +284,19 @@
   // ---------- Returning from Stripe ----------
   const status = new URLSearchParams(window.location.search).get("status");
   if (status === "success") {
+    const hasLogo = cart.some((o) => o.logo);
     form.innerHTML = `
       <div class="co-success">
         <div class="co-success-check">✓</div>
         <h3>Order received!</h3>
         <p>Thanks! Your payment went through — Stripe is emailing your receipt now.
-        We'll be in touch${order.logo ? " (and we'll ask for your logo file)" : ""} with a
-        proof of your ${esc(order.formatLabel.toLowerCase())} before it prints.</p>
+        We'll be in touch${hasLogo ? " (and we'll ask for your logo file)" : ""} with a
+        proof of every design before it prints.</p>
         <a class="btn btn-outline" href="/customize">Design another</a>
       </div>`;
+    localStorage.removeItem("boopCart");
+    localStorage.removeItem("boopOrder");
   } else if (status === "cancel") {
-    msg.textContent = "Payment canceled — no charge was made. Your design is saved, so you can pay whenever you're ready.";
+    msg.textContent = "Payment canceled — no charge was made. Your designs are saved, so you can pay whenever you're ready.";
   }
 })();

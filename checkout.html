@@ -33,23 +33,17 @@
 
         <!-- ============ ORDER SUMMARY ============ -->
         <section class="co-summary">
-          <h2>Your design</h2>
+          <h2>Your designs</h2>
           <div class="co-faces" id="co-faces"></div>
-          <dl class="spec-list" id="spec-list"></dl>
-          <a class="co-edit" href="/customize">← Edit design</a>
+          <a class="co-edit" href="/customize">← Add or edit designs</a>
         </section>
 
-        <!-- ============ QUANTITY + PAYMENT ============ -->
+        <!-- ============ PACK + PAYMENT ============ -->
         <form class="options-panel co-pay" id="pay-form" novalidate>
           <div class="opt-group">
-            <h3 class="opt-title">Quantity</h3>
-            <div class="qty-row">
-              <button type="button" class="qty-btn" id="qty-minus" aria-label="Decrease quantity">−</button>
-              <input type="number" id="qty" value="1" min="1" max="500" inputmode="numeric" aria-label="Quantity" />
-              <button type="button" class="qty-btn" id="qty-plus" aria-label="Increase quantity">+</button>
-              <span class="qty-unit" id="unit-price"></span>
-            </div>
-            <p class="qty-hint" id="qty-hint">Bundle deal: every 4 tags ring up as a $99.99 pack.</p>
+            <h3 class="opt-title">Your pack</h3>
+            <div id="pack-list"></div>
+            <p class="qty-hint" id="qty-hint">Every 4 tags ring up as a $99.99 pack — mix &amp; match designs.</p>
           </div>
 
           <div class="opt-group">

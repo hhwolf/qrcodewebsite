@@ -47,7 +47,7 @@
           <span class="tpl-blank-text"><strong>The Blank Canvas</strong> — start from scratch and make every choice yours: format, sides, colors, style, and text.</span>
         </button>
 
-        <h3 class="tpl-group-title">5×7 counter displays <span class="tpl-group-note">printed 5″×7″ for a frame or stand — scannable QR plus tap-to-boop panel</span></h3>
+        <h3 class="tpl-group-title">5×7 counter displays <span class="tpl-group-note">printed 5″×7″ and shipped in a wooden frame — scannable QR plus tap-to-boop panel</span></h3>
         <div class="tpl-grid" id="tpl-grid-cards">
           <!-- Template cards are rendered by customize.js from the TEMPLATES list -->
         </div>
@@ -159,8 +159,7 @@
             <div class="pill-row" role="radiogroup" aria-label="Format">
               <label class="pill"><input type="radio" name="format" value="card" checked /><span>Card</span></label>
               <label class="pill"><input type="radio" name="format" value="sticker" /><span>Sticker</span></label>
-              <label class="pill"><input type="radio" name="format" value="tent" /><span>Table tent</span></label>
-              <label class="pill"><input type="radio" name="format" value="five7" /><span>5×7 card</span></label>
+              <label class="pill"><input type="radio" name="format" value="five7" /><span>5×7 display</span></label>
             </div>
           </div>
 
@@ -249,8 +248,12 @@
 
           <div class="opt-group opt-group-submit">
             <h3 class="opt-title">7. Ready to order?</h3>
-            <p class="opt-note">You'll pick a quantity and pay on the next page. You can come back and edit any time.</p>
-            <button type="submit" class="btn btn-wide">Continue to checkout →</button>
+            <p class="opt-note">Ordering more than one? Add this design to your pack and keep designing — every 4 tags ring up as a $99.99 pack, mix &amp; match.</p>
+            <div class="order-row">
+              <button type="button" class="btn btn-outline" id="add-pack">+ Add &amp; design another</button>
+              <button type="submit" class="btn">Continue to checkout →</button>
+            </div>
+            <p class="form-msg form-msg-light" id="pack-msg" role="status"></p>
           </div>
 
         </form>
