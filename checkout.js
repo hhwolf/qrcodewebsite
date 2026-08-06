@@ -44,27 +44,50 @@
     </g>`;
   const QR_SVG = `<svg class="pv-qr" viewBox="0 0 40 40" aria-hidden="true">${QR_SVG_INNER}</svg>`;
   const QR_SVG_BIG = `<svg class="pv-qr pv-qr-big" viewBox="0 0 40 40" aria-hidden="true">${QR_SVG_INNER}</svg>`;
-  const QR_SVG_GHOST = `<svg class="pv-qr pv-qr-ghost" viewBox="0 0 40 40" aria-hidden="true">${QR_SVG_INNER}</svg>`;
   const NFC_SVG = `
     <svg class="pv-nfc" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M6 9c1.5 1.8 1.5 4.2 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       <path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/>
       <path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/>
     </svg>`;
-  const STICKER_ZONE = `
-    <span class="pv-sticker-wrap">
-      <span class="pv-sticker-zone">${QR_SVG_GHOST}</span>
-      <span class="pv-zone-label">2″ × 2″ QR sticker</span>
-    </span>`;
+
+  function posterExtra(usecase) {
+    if (usecase === "review") {
+      return `<span class="pv-stars">★★★★★</span><span class="pv-extra-line">Leave a review on <strong>Google</strong></span>`;
+    }
+    if (usecase === "wifi") {
+      return `<span class="pv-rule-line">NETWORK</span><span class="pv-rule-line">PASSWORD</span>`;
+    }
+    if (usecase === "instagram") {
+      return `<span class="pv-chips"><span>INSTAGRAM</span><span>FACEBOOK</span><span>TIKTOK</span></span>`;
+    }
+    return "";
+  }
 
   function frontFace(o) {
     const logo = o.logo ? `<img class="co-logo" src="${o.logo}" alt="" />` : "";
+    const vars = `--pv-bg:${o.bg};--pv-fg:${o.fg};--pv-accent:${o.accent};--pv-accent-fg:${o.accentFg}`;
+    if (o.format === "five7") {
+      const bandRight = o.logo
+        ? `<img class="pv-poster-logo" src="${o.logo}" alt="" />`
+        : `<span class="pv-poster-dot"></span>`;
+      return `
+        <div class="preview-tag format-five7 style-${o.style}" style="${vars}">
+          <span class="pv-poster-band"><span class="pv-poster-label">${esc(o.posterLabel || "TAP OR SCAN")}</span>${bandRight}</span>
+          <span class="pv-callout">${esc(o.callout)}</span>
+          <span class="pv-poster-sub">${esc(o.posterSub || "")}</span>
+          <span class="pv-poster-extra">${posterExtra(o.usecase)}</span>
+          <span class="pv-poster-row">
+            <span class="pv-qrbox"><span class="pv-qrbox-head">${esc(o.scanLabel || "SCAN ME")}</span><img class="pv-qrbox-img" src="assets/sample-qr.svg" alt="" /></span>
+            <span class="pv-tappanel">${NFC_SVG.replace("pv-nfc", "pv-tappanel-nfc")}<span class="pv-tappanel-tap">TAP</span><span class="pv-tappanel-hint">HOLD PHONE HERE</span></span>
+          </span>
+          <span class="pv-poster-foot"><span class="pv-poster-boop">boop</span><span class="pv-poster-name">${esc(o.name)}</span></span>
+        </div>`;
+    }
     return `
-      <div class="preview-tag format-${o.format} style-${o.style}"
-           style="--pv-bg:${o.bg};--pv-fg:${o.fg};--pv-accent:${o.accent};--pv-accent-fg:${o.accentFg}">
+      <div class="preview-tag format-${o.format} style-${o.style}" style="${vars}">
         <span class="pv-brand">${logo}<span class="pv-name">${esc(o.name)}</span></span>
         <span class="pv-callout">${esc(o.callout)}</span>
-        ${o.format === "five7" ? STICKER_ZONE : ""}
         <span class="pv-bottom">${QR_SVG}${NFC_SVG}</span>
       </div>`;
   }

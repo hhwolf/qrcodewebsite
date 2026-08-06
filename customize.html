@@ -22,7 +22,7 @@
         <a href="index.html#pricing">Pricing</a>
         <a href="customize.html" class="nav-active" aria-current="page">Customize &amp; order</a>
       </nav>
-      <a href="index.html#early-access" class="btn btn-small">Get early access</a>
+      <a href="checkout.html" class="btn btn-small">Checkout</a>
     </div>
   </header>
 
@@ -47,7 +47,7 @@
           <span class="tpl-blank-text"><strong>The Blank Canvas</strong> — start from scratch and make every choice yours: format, sides, colors, style, and text.</span>
         </button>
 
-        <h3 class="tpl-group-title">5×7 counter cards <span class="tpl-group-note">printed 5″×7″, with a 2″×2″ zone for your boop QR sticker</span></h3>
+        <h3 class="tpl-group-title">5×7 counter displays <span class="tpl-group-note">printed 5″×7″ for a frame or stand — scannable QR plus tap-to-boop panel</span></h3>
         <div class="tpl-grid" id="tpl-grid-cards">
           <!-- Template cards are rendered by customize.js from the TEMPLATES list -->
         </div>
@@ -73,29 +73,37 @@
               <div class="flip-inner" id="flip-inner">
                 <div class="flip-face flip-front">
             <div class="preview-tag format-card" id="preview">
+              <span class="pv-poster-band">
+                <span class="pv-poster-label" id="pv-poster-label">TAP OR SCAN</span>
+                <img class="pv-poster-logo" id="pv-poster-logo" alt="" hidden />
+                <span class="pv-poster-dot" id="pv-poster-dot"></span>
+              </span>
               <div class="pv-brand">
                 <img id="pv-logo" alt="" hidden />
                 <span class="pv-name" id="pv-name">Your Business</span>
               </div>
               <span class="pv-callout" id="pv-callout">Tap for menu</span>
-              <div class="pv-sticker-wrap">
-                <div class="pv-sticker-zone">
-                  <svg class="pv-qr pv-qr-ghost" viewBox="0 0 40 40" aria-hidden="true">
-                    <g fill="currentColor">
-                      <rect x="0" y="0" width="12" height="12" rx="2"/><rect x="3" y="3" width="6" height="6" class="qr-hole" rx="1"/>
-                      <rect x="28" y="0" width="12" height="12" rx="2"/><rect x="31" y="3" width="6" height="6" class="qr-hole" rx="1"/>
-                      <rect x="0" y="28" width="12" height="12" rx="2"/><rect x="3" y="31" width="6" height="6" class="qr-hole" rx="1"/>
-                      <rect x="17" y="0" width="5" height="5"/><rect x="17" y="9" width="5" height="5"/>
-                      <rect x="17" y="18" width="5" height="5"/><rect x="26" y="18" width="5" height="5"/>
-                      <rect x="35" y="18" width="5" height="5"/><rect x="17" y="27" width="5" height="5"/>
-                      <rect x="26" y="27" width="5" height="5"/><rect x="35" y="30" width="5" height="5"/>
-                      <rect x="17" y="35" width="5" height="5"/><rect x="28" y="35" width="5" height="5" opacity=".6"/>
-                      <rect x="8" y="17" width="5" height="5"/><rect x="0" y="17" width="5" height="5" opacity=".6"/>
-                    </g>
+              <span class="pv-poster-sub" id="pv-poster-sub"></span>
+              <span class="pv-poster-extra" id="pv-poster-extra"></span>
+              <span class="pv-poster-row">
+                <span class="pv-qrbox">
+                  <span class="pv-qrbox-head" id="pv-scan-label">SCAN ME</span>
+                  <img class="pv-qrbox-img" src="assets/sample-qr.svg" alt="Sample QR code" />
+                </span>
+                <span class="pv-tappanel">
+                  <svg class="pv-tappanel-nfc" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M6 9c1.5 1.8 1.5 4.2 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/>
+                    <path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/>
                   </svg>
-                </div>
-                <span class="pv-zone-label">2″ × 2″ QR sticker</span>
-              </div>
+                  <span class="pv-tappanel-tap">TAP</span>
+                  <span class="pv-tappanel-hint">HOLD PHONE HERE</span>
+                </span>
+              </span>
+              <span class="pv-poster-foot">
+                <span class="pv-poster-boop">boop</span>
+                <span class="pv-poster-name" id="pv-poster-name"></span>
+              </span>
               <div class="pv-bottom">
                 <svg class="pv-qr" viewBox="0 0 40 40" aria-hidden="true">
                   <g fill="currentColor">
@@ -204,6 +212,8 @@
                 <label class="swatch" style="--sw: #22D3EE"><input type="radio" name="accent" value="#22D3EE" /><span class="visually-hidden">Cyan</span></label>
                 <label class="swatch" style="--sw: #F59E0B"><input type="radio" name="accent" value="#F59E0B" /><span class="visually-hidden">Gold</span></label>
                 <label class="swatch" style="--sw: #C4532D"><input type="radio" name="accent" value="#C4532D" /><span class="visually-hidden">Terracotta</span></label>
+                <label class="swatch" style="--sw: #1F8A63"><input type="radio" name="accent" value="#1F8A63" /><span class="visually-hidden">Green</span></label>
+                <label class="swatch" style="--sw: #E01583"><input type="radio" name="accent" value="#E01583" /><span class="visually-hidden">Pink</span></label>
                 <label class="swatch" style="--sw: #7C3AED"><input type="radio" name="accent" value="#7C3AED" /><span class="visually-hidden">Purple</span></label>
                 <label class="swatch" style="--sw: #0A0F1E"><input type="radio" name="accent" value="#0A0F1E" /><span class="visually-hidden">Ink</span></label>
               </div>

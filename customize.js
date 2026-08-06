@@ -49,46 +49,64 @@
     },
   };
 
+  // Poster copy for the 5×7 counter displays, keyed by use case:
+  // header-band label, subline under the headline, and QR-box caption.
+  const POSTER = {
+    review: { label: "THIRTY SECONDS, TOPS", sub: "A review on Google helps a small shop more than almost anything else. Thank you.", scan: "SCAN TO REVIEW" },
+    wifi: { label: "GUEST NETWORK", sub: "The password is already inside the code. Scan it, or tap your phone on the panel.", scan: "SCAN TO CONNECT" },
+    pay: { label: "PAY HERE", sub: "Opens your checkout link straight in the browser. No app to download, no account to make.", scan: "SCAN TO PAY" },
+    instagram: { label: "FOLLOW ALONG", sub: "Specials, new arrivals and today's hours land on our page first.", scan: "SCAN TO FOLLOW" },
+    menu: { label: "TODAY'S MENU", sub: "Always current — prices and specials update the moment we change them.", scan: "SCAN FOR MENU" },
+    bizcard: { label: "LET'S CONNECT", sub: "Save the contact card straight to your phone.", scan: "SCAN TO SAVE" },
+    custom: { label: "TAP OR SCAN", sub: "Tap your phone on the panel, or scan the code. It takes seconds.", scan: "SCAN ME" },
+  };
+
+  function posterExtra(usecase) {
+    if (usecase === "review") {
+      return `<span class="pv-stars">★★★★★</span><span class="pv-extra-line">Leave a review on <strong>Google</strong></span>`;
+    }
+    if (usecase === "wifi") {
+      return `<span class="pv-rule-line">NETWORK</span><span class="pv-rule-line">PASSWORD</span>`;
+    }
+    if (usecase === "instagram") {
+      return `<span class="pv-chips"><span>INSTAGRAM</span><span>FACEBOOK</span><span>TIKTOK</span></span>`;
+    }
+    return "";
+  }
+
   // ---------- Templates: curated two-sided starting points ----------
   // bg/accent flow through the "custom" color slot so every template
   // stays fully editable. `back` designs the reverse side of cards and
   // tents; stickers are single-sided, so their templates have no back.
   const TEMPLATES = [
-    // --- 5×7 counter cards (printed 5″×7″, 2″×2″ zone for a boop QR sticker) ---
+    // --- 5×7 counter displays (framed poster layout with QR + tap panel) ---
     {
-      key: "review57", group: "cards57", label: "The Review Card",
-      desc: "Counter card that turns happy customers into Google reviews.",
+      key: "review57", group: "cards57", label: "The Review Display",
+      desc: "Turns happy customers into Google reviews at the counter.",
       thumbName: "Blue Door Salon", callout: "How did we do?",
-      format: "five7", usecase: "review", bg: "#ffffff", accent: "#F59E0B", style: "band",
+      format: "five7", usecase: "review", bg: "#ffffff", accent: "#F59E0B", style: "classic",
       back: { mode: "qr-text", text: "Scan to leave a review" },
     },
     {
-      key: "wifi57", group: "cards57", label: "The Wi-Fi Card",
-      desc: "Guest Wi-Fi at the front desk — no password spelling.",
-      thumbName: "Studio K", callout: "Guest Wi-Fi",
-      format: "five7", usecase: "wifi", bg: "#2563EB", accent: "#0A0F1E", style: "classic",
+      key: "wifi57", group: "cards57", label: "The Wi-Fi Display",
+      desc: "Guest Wi-Fi with the password inside the code.",
+      thumbName: "Studio K", callout: "Free wifi, no typing.",
+      format: "five7", usecase: "wifi", bg: "#ffffff", accent: "#2563EB", style: "classic",
       back: { mode: "qr-text", text: "Scan to join the Wi-Fi" },
     },
     {
-      key: "menu57", group: "cards57", label: "The Menu Card",
-      desc: "A digital menu by the register or host stand.",
-      thumbName: "Café Norte", callout: "Our Menu",
-      format: "five7", usecase: "menu", bg: "#FAF3E7", accent: "#C4532D", style: "band",
-      back: { mode: "qr-text", text: "Scan for today's menu" },
-    },
-    {
-      key: "social57", group: "cards57", label: "The Social Card",
-      desc: "Instagram and social links, growing your following IRL.",
-      thumbName: "@cornercafe", callout: "Follow us",
-      format: "five7", usecase: "instagram", bg: "#7C3AED", accent: "#22D3EE", style: "classic",
-      back: { mode: "qr-text", text: "Scan to follow" },
-    },
-    {
-      key: "pay57", group: "cards57", label: "The Payment Card",
-      desc: "Payments and tips, cash-free at the counter.",
-      thumbName: "Tips for Alex", callout: "Pay or tip here",
-      format: "five7", usecase: "pay", bg: "#0A0F1E", accent: "#22D3EE", style: "band",
+      key: "pay57", group: "cards57", label: "The Payment Display",
+      desc: "Checkout links straight in the browser — no app, no account.",
+      thumbName: "Tips for Alex", callout: "Pay with your phone.",
+      format: "five7", usecase: "pay", bg: "#ffffff", accent: "#1F8A63", style: "classic",
       back: { mode: "qr-text", text: "Scan to pay or tip" },
+    },
+    {
+      key: "social57", group: "cards57", label: "The Social Display",
+      desc: "Instagram, Facebook, and TikTok — one scan to follow.",
+      thumbName: "@cornercafe", callout: "See what's new here.",
+      format: "five7", usecase: "instagram", bg: "#ffffff", accent: "#E01583", style: "classic",
+      back: { mode: "qr-text", text: "Scan to follow" },
     },
 
     // --- Tags & stickers ---
@@ -141,12 +159,7 @@
 
   const QR_SVG = `<svg class="pv-qr" viewBox="0 0 40 40" aria-hidden="true">${QR_SVG_INNER}</svg>`;
   const QR_SVG_BIG = `<svg class="pv-qr pv-qr-big" viewBox="0 0 40 40" aria-hidden="true">${QR_SVG_INNER}</svg>`;
-  const QR_SVG_GHOST = `<svg class="pv-qr pv-qr-ghost" viewBox="0 0 40 40" aria-hidden="true">${QR_SVG_INNER}</svg>`;
-  const STICKER_ZONE = `
-    <span class="pv-sticker-wrap">
-      <span class="pv-sticker-zone">${QR_SVG_GHOST}</span>
-      <span class="pv-zone-label">2″ × 2″ QR sticker</span>
-    </span>`;
+  const SAMPLE_QR = `<img class="pv-qrbox-img" src="assets/sample-qr.svg" alt="" />`;
 
   const NFC_SVG = `
     <svg class="pv-nfc" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -229,12 +242,28 @@
     pvCallout.textContent = calloutText();
     pvBackCallout.textContent = backCalloutText();
 
+    // Poster elements (only visible in the five7 format)
+    const poster = POSTER[state.usecase] || POSTER.custom;
+    document.getElementById("pv-poster-label").textContent = poster.label;
+    document.getElementById("pv-poster-sub").textContent = poster.sub;
+    document.getElementById("pv-scan-label").textContent = poster.scan;
+    document.getElementById("pv-poster-extra").innerHTML = posterExtra(state.usecase);
+    document.getElementById("pv-poster-name").textContent = state.name || "";
+
+    const posterLogo = document.getElementById("pv-poster-logo");
+    const posterDot = document.getElementById("pv-poster-dot");
     if (state.logo) {
       pvLogo.src = state.logo;
       pvLogo.hidden = false;
+      posterLogo.src = state.logo;
+      posterLogo.hidden = false;
+      posterDot.hidden = true;
     } else {
       pvLogo.removeAttribute("src");
       pvLogo.hidden = true;
+      posterLogo.removeAttribute("src");
+      posterLogo.hidden = true;
+      posterDot.hidden = false;
     }
 
     const colorLabel = LABELS.color[bg] || bg.toUpperCase();
@@ -272,12 +301,29 @@
   };
 
   function frontFaceMarkup(t) {
+    const vars = `--pv-bg:${t.bg};--pv-fg:${fgFor(t.bg)};--pv-accent:${t.accent};--pv-accent-fg:${fgFor(t.accent)}`;
+    if (t.format === "five7") {
+      const poster = POSTER[t.usecase] || POSTER.custom;
+      return `
+        <span class="preview-tag format-five7 style-${t.style}" style="${vars}">
+          <span class="pv-poster-band">
+            <span class="pv-poster-label">${poster.label}</span>
+            <span class="pv-poster-dot"></span>
+          </span>
+          <span class="pv-callout">${t.callout || CALLOUTS[t.usecase]}</span>
+          <span class="pv-poster-sub">${poster.sub}</span>
+          <span class="pv-poster-extra">${posterExtra(t.usecase)}</span>
+          <span class="pv-poster-row">
+            <span class="pv-qrbox"><span class="pv-qrbox-head">${poster.scan}</span>${SAMPLE_QR}</span>
+            <span class="pv-tappanel">${NFC_SVG.replace("pv-nfc", "pv-tappanel-nfc")}<span class="pv-tappanel-tap">TAP</span><span class="pv-tappanel-hint">HOLD PHONE HERE</span></span>
+          </span>
+          <span class="pv-poster-foot"><span class="pv-poster-boop">boop</span><span class="pv-poster-name">${t.thumbName}</span></span>
+        </span>`;
+    }
     return `
-      <span class="preview-tag format-${t.format} style-${t.style}"
-            style="--pv-bg:${t.bg};--pv-fg:${fgFor(t.bg)};--pv-accent:${t.accent};--pv-accent-fg:${fgFor(t.accent)}">
+      <span class="preview-tag format-${t.format} style-${t.style}" style="${vars}">
         <span class="pv-brand"><span class="pv-name">${t.thumbName}</span></span>
         <span class="pv-callout">${t.callout || CALLOUTS[t.usecase]}</span>
-        ${t.format === "five7" ? STICKER_ZONE : ""}
         <span class="pv-bottom">${QR_SVG}${NFC_SVG}</span>
       </span>`;
   }
@@ -309,6 +355,11 @@
   }
 
   const accentWrap = document.getElementById("accent-wrap");
+
+  // Accents color the band/panel on 5×7 displays regardless of style.
+  function updateAccentVisibility() {
+    accentWrap.hidden = state.style === "classic" && state.format !== "five7";
+  }
   const customWrap = document.getElementById("custom-callout-wrap");
   const customText = document.getElementById("custom-callout");
   const customColor = document.getElementById("custom-color");
@@ -341,7 +392,7 @@
     setRadio("back", state.back);
     setRadio("color", "custom");
     customWrap.hidden = true;
-    accentWrap.hidden = t.style === "classic";
+    updateAccentVisibility();
     backTextWrap.hidden = state.back !== "qr-text";
     updateBackAvailability();
     setView("front");
@@ -366,6 +417,7 @@
     el.addEventListener("change", () => {
       state.format = checked("format");
       updateBackAvailability();
+      updateAccentVisibility();
       deselectTemplates();
       render();
     })
@@ -390,7 +442,7 @@
   document.querySelectorAll('input[name="style"]').forEach((el) =>
     el.addEventListener("change", () => {
       state.style = checked("style");
-      accentWrap.hidden = state.style === "classic";
+      updateAccentVisibility();
       deselectTemplates();
       render();
     })
@@ -495,7 +547,7 @@
     setRadio("accent", "#2563EB");
     setRadio("back", "qr-text");
     customWrap.hidden = false;
-    accentWrap.hidden = true;
+    updateAccentVisibility();
     backTextWrap.hidden = false;
 
     deselectTemplates();
@@ -528,6 +580,9 @@
       name: state.name || "Your Business",
       logo: state.logo,
       templateLabel: state.templateLabel,
+      posterLabel: (POSTER[state.usecase] || POSTER.custom).label,
+      posterSub: (POSTER[state.usecase] || POSTER.custom).sub,
+      scanLabel: (POSTER[state.usecase] || POSTER.custom).scan,
     };
     try {
       localStorage.setItem("boopOrder", JSON.stringify(order));
