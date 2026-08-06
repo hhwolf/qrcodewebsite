@@ -44,6 +44,10 @@ export default async function handler(req, res) {
     "shipping_options[0][shipping_rate_data][display_name]": "Standard shipping",
     "shipping_options[0][shipping_rate_data][fixed_amount][amount]": "1000",
     "shipping_options[0][shipping_rate_data][fixed_amount][currency]": "usd",
+    "shipping_options[1][shipping_rate_data][type]": "fixed_amount",
+    "shipping_options[1][shipping_rate_data][display_name]": "Local pickup (free)",
+    "shipping_options[1][shipping_rate_data][fixed_amount][amount]": "0",
+    "shipping_options[1][shipping_rate_data][fixed_amount][currency]": "usd",
     // Design spec lands on the payment in the Stripe dashboard for fulfillment.
     "metadata[format]": meta(format),
     "metadata[usecase]": meta(usecase),

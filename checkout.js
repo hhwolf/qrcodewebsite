@@ -25,7 +25,8 @@
   const UNIT_C = 2999;
   const BUNDLE_SIZE = 4;
   const BUNDLE_C = 9999;
-  const SHIPPING_C = 1000; // flat, matches the Stripe shipping option
+  // Shipping ($10 standard or free pickup) is chosen on Stripe's page,
+  // so totals here are pre-shipping.
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, (c) => ({
@@ -152,9 +153,8 @@
     subtotalEl.textContent = fmt(subtotal);
     discountLine.hidden = discount === 0;
     discountEl.textContent = `−${fmt(discount)}`;
-    const total = itemsTotal + SHIPPING_C;
-    totalEl.textContent = fmt(total);
-    document.getElementById("pay-btn").textContent = `Pay with Stripe · ${fmt(total)}`;
+    totalEl.textContent = fmt(itemsTotal);
+    document.getElementById("pay-btn").textContent = `Pay with Stripe · ${fmt(itemsTotal)}`;
   }
 
   qtyInput.addEventListener("input", updateTotals);
