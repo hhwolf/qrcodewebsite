@@ -219,7 +219,7 @@
         <p>Thanks! Your payment went through — Stripe is emailing your receipt now.
         We'll be in touch${order.logo ? " (and we'll ask for your logo file)" : ""} with a
         proof of your ${esc(order.formatLabel.toLowerCase())} before it prints.</p>
-        <a class="btn btn-outline" href="customize.html">Design another</a>
+        <a class="btn btn-outline" href="/customize">Design another</a>
       </div>`;
   } else if (status === "cancel") {
     msg.textContent = "Payment canceled — no charge was made. Your design is saved, so you can pay whenever you're ready.";

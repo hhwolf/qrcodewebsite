@@ -590,7 +590,7 @@
       // A large logo data URL can exceed the storage quota — drop it and keep going.
       localStorage.setItem("boopOrder", JSON.stringify({ ...order, logo: null }));
     }
-    window.location.href = "checkout.html";
+    window.location.href = "/checkout";
   });
 
   updateBackAvailability();

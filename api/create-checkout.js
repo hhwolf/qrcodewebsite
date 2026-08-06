@@ -36,8 +36,8 @@ export default async function handler(req, res) {
 
   const params = new URLSearchParams({
     mode: "payment",
-    success_url: `${origin}/checkout.html?status=success`,
-    cancel_url: `${origin}/checkout.html?status=cancel`,
+    success_url: `${origin}/checkout?status=success`,
+    cancel_url: `${origin}/checkout?status=cancel`,
     "shipping_address_collection[allowed_countries][0]": "US",
     "shipping_address_collection[allowed_countries][1]": "CA",
     "shipping_options[0][shipping_rate_data][type]": "fixed_amount",
