@@ -63,15 +63,17 @@
   .stars { color: var(--accent); font-size: 21pt; letter-spacing: 0.12em; line-height: 1; }
   .extra-line { display: block; font-size: 11pt; color: #3a3f49; margin-top: 0.08in; }
   .extra-line strong { color: #14161c; }
+  .extra { flex-shrink: 0; }
   .rule-line {
     font-size: 8pt;
     font-weight: 600;
     letter-spacing: 0.2em;
     color: #8a8f99;
     border-top: 1px solid #d9dce2;
-    padding-top: 0.06in;
-    margin-top: 0.14in;
+    padding-top: 0.05in;
+    margin-top: 0.1in;
   }
+  .rule-line.dotted { border-top-style: dotted; border-top-width: 2.4px; }
   .chips { display: flex; gap: 0.08in; }
   .chip {
     font-size: 8pt;
@@ -111,7 +113,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.2in;
+    min-height: 2in;
   }
   .qrbox-body img { width: 1.75in; height: 1.75in; opacity: 0.1; }
   .qr-note {
@@ -209,6 +211,9 @@
   <div class="band"><span class="band-label">PAY HERE</span><span class="band-dot"></span></div>
   <div class="headline">Pay with<br />your phone.</div>
   <p class="sub">Opens your checkout link straight in the browser. No app to download, no account to make.</p>
+  <div class="extra">
+    <div class="chips"><span class="chip">APPLE PAY</span><span class="chip">GOOGLE PAY</span><span class="chip">CARD</span></div>
+  </div>
   <div class="row">
     <div class="qrbox">
       <div class="qrbox-head">SCAN TO PAY</div>
@@ -249,6 +254,11 @@
   <div class="band"><span class="band-label">DIGITAL MENU</span><span class="band-dot"></span></div>
   <div class="headline">View our<br />menu.</div>
   <p class="sub">Tap or scan to open our digital menu with the latest items.</p>
+  <div class="extra">
+    <div class="rule-line dotted">STARTERS</div>
+    <div class="rule-line dotted">MAINS</div>
+    <div class="rule-line dotted">DRINKS</div>
+  </div>
   <div class="row">
     <div class="qrbox">
       <div class="qrbox-head">SCAN TO VIEW MENU</div>

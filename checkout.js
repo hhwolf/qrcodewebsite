@@ -94,6 +94,12 @@
     if (usecase === "instagram") {
       return `<span class="pv-chips"><span>INSTAGRAM</span><span>FACEBOOK</span><span>TIKTOK</span></span>`;
     }
+    if (usecase === "pay") {
+      return `<span class="pv-chips"><span>APPLE PAY</span><span>GOOGLE PAY</span><span>CARD</span></span>`;
+    }
+    if (usecase === "menu") {
+      return `<span class="pv-rule-line pv-dotted">STARTERS</span><span class="pv-rule-line pv-dotted">MAINS</span><span class="pv-rule-line pv-dotted">DRINKS</span>`;
+    }
     return "";
   }
 
