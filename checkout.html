@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — boop</title>
+  <meta name="description" content="Review your boop design, pick a quantity, and place your order." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563EB'/%3E%3Ctext x='32' y='44' font-family='sans-serif' font-size='36' font-weight='700' fill='white' text-anchor='middle'%3Eb.%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="logo" href="index.html">boop<span class="logo-dot">.</span></a>
+      <a href="customize.html" class="btn btn-small btn-ghost">← Back to design</a>
+    </div>
+  </header>
+
+  <main class="checkout">
+    <div class="container">
+      <h1 class="co-title">Checkout</h1>
+
+      <div class="co-empty" id="co-empty" hidden>
+        <p>You haven't designed a boop yet.</p>
+        <a class="btn" href="customize.html">Start designing</a>
+      </div>
+
+      <div class="co-grid" id="co-content" hidden>
+
+        <!-- ============ ORDER SUMMARY ============ -->
+        <section class="co-summary">
+          <h2>Your design</h2>
+          <div class="co-faces" id="co-faces"></div>
+          <dl class="spec-list" id="spec-list"></dl>
+          <a class="co-edit" href="customize.html">← Edit design</a>
+        </section>
+
+        <!-- ============ QUANTITY + PAYMENT ============ -->
+        <form class="options-panel co-pay" id="pay-form" novalidate>
+          <div class="opt-group">
+            <h3 class="opt-title">Quantity</h3>
+            <div class="qty-row">
+              <button type="button" class="qty-btn" id="qty-minus" aria-label="Decrease quantity">−</button>
+              <input type="number" id="qty" value="1" min="1" max="500" inputmode="numeric" aria-label="Quantity" />
+              <button type="button" class="qty-btn" id="qty-plus" aria-label="Increase quantity">+</button>
+              <span class="qty-unit" id="unit-price"></span>
+            </div>
+            <p class="qty-hint" id="qty-hint">Order 3 or more and save 20%.</p>
+          </div>
+
+          <div class="opt-group">
+            <h3 class="opt-title">Total</h3>
+            <div class="price-lines">
+              <div class="price-line"><span>Subtotal</span><span id="subtotal"></span></div>
+              <div class="price-line" id="discount-line" hidden><span>Bulk discount (20%)</span><span id="discount"></span></div>
+              <div class="price-line"><span>Shipping</span><span class="price-free">Free</span></div>
+              <div class="price-line price-line-total"><span>Total</span><span id="total"></span></div>
+            </div>
+          </div>
+
+          <div class="opt-group">
+            <h3 class="opt-title">Contact &amp; shipping</h3>
+            <label class="field-label" for="co-email">Email</label>
+            <input type="email" id="co-email" autocomplete="email" placeholder="you@example.com" required />
+            <label class="field-label" for="co-name">Full name</label>
+            <input type="text" id="co-name" autocomplete="name" placeholder="Jordan Lee" required />
+            <label class="field-label" for="co-address">Address</label>
+            <input type="text" id="co-address" autocomplete="street-address" placeholder="123 Main St, Apt 4" required />
+            <div class="field-cols">
+              <div>
+                <label class="field-label" for="co-city">City</label>
+                <input type="text" id="co-city" autocomplete="address-level2" placeholder="San Francisco" required />
+              </div>
+              <div>
+                <label class="field-label" for="co-zip">ZIP</label>
+                <input type="text" id="co-zip" autocomplete="postal-code" placeholder="94110" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="opt-group">
+            <h3 class="opt-title">Payment</h3>
+            <label class="field-label" for="co-card">Card number</label>
+            <input type="text" id="co-card" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" required />
+            <div class="field-cols">
+              <div>
+                <label class="field-label" for="co-exp">Expiry</label>
+                <input type="text" id="co-exp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" required />
+              </div>
+              <div>
+                <label class="field-label" for="co-cvc">CVC</label>
+                <input type="text" id="co-cvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" required />
+              </div>
+            </div>
+            <p class="demo-note">Demo checkout — payments aren't live yet. No card will be charged; we'll email you to confirm your order.</p>
+          </div>
+
+          <div class="opt-group opt-group-submit">
+            <button type="submit" class="btn btn-wide" id="pay-btn">Place order</button>
+            <p class="form-msg form-msg-light" id="pay-msg" role="status"></p>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a class="logo logo-footer" href="index.html">boop<span class="logo-dot">.</span></a>
+      <p>© <span id="year"></span> boop. All rights reserved.</p>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="index.html#use-cases">Use cases</a>
+        <a href="index.html#pricing">Pricing</a>
+        <a href="customize.html">Order</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+  <script src="checkout.js"></script>
+</body>
+</html>

@@ -472,19 +472,70 @@
     render();
   });
 
-  // ---------- Request form (stub — wire to a real endpoint later) ----------
+  // ---------- Blank canvas: reset to a fully custom starting point ----------
+  const blankBtn = document.getElementById("tpl-blank");
+  blankBtn.addEventListener("click", () => {
+    state.format = "card";
+    state.usecase = "custom";
+    state.customText = "";
+    state.color = "#ffffff";
+    state.style = "classic";
+    state.accent = "#2563EB";
+    state.back = "qr-text";
+    state.backText = "";
+    state.calloutOverride = null;
+    state.backTextOverride = null;
+    customText.value = "";
+    backText.value = "";
+
+    setRadio("format", "card");
+    setRadio("usecase", "custom");
+    setRadio("color", "#ffffff");
+    setRadio("style", "classic");
+    setRadio("accent", "#2563EB");
+    setRadio("back", "qr-text");
+    customWrap.hidden = false;
+    accentWrap.hidden = true;
+    backTextWrap.hidden = false;
+
+    deselectTemplates();
+    updateBackAvailability();
+    setView("front");
+    render();
+    document.querySelector(".options-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // ---------- Continue to checkout ----------
   const form = document.getElementById("order-form");
-  const msg = document.getElementById("order-msg");
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const email = document.getElementById("order-email").value.trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      msg.textContent = "Hmm, that doesn't look like an email — try again?";
-      return;
+    const bg = resolveColor();
+    const order = {
+      format: state.format,
+      formatLabel: LABELS.format[state.format],
+      usecase: state.usecase,
+      usecaseLabel: LABELS.usecase[state.usecase],
+      style: state.style,
+      accent: state.accent,
+      accentFg: fgFor(state.accent),
+      bg,
+      fg: fgFor(bg),
+      colorLabel: LABELS.color[bg] || bg.toUpperCase(),
+      singleSided: isSingleSided(),
+      back: state.back,
+      callout: calloutText(),
+      backCallout: backCalloutText(),
+      name: state.name || "Your Business",
+      logo: state.logo,
+      templateLabel: state.templateLabel,
+    };
+    try {
+      localStorage.setItem("boopOrder", JSON.stringify(order));
+    } catch (err) {
+      // A large logo data URL can exceed the storage quota — drop it and keep going.
+      localStorage.setItem("boopOrder", JSON.stringify({ ...order, logo: null }));
     }
-    // TODO: POST { ...state, bg: resolveColor(), backCallout: backCalloutText(), email }
-    // to your backend. state.logo holds the uploaded image as a data URL.
-    msg.textContent = `Got it! We'll send a proof of your ${LABELS.format[state.format].toLowerCase()} (${LABELS.usecase[state.usecase]}) to ${email}. ✓`;
+    window.location.href = "checkout.html";
   });
 
   updateBackAvailability();
