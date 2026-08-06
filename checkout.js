@@ -19,10 +19,10 @@
   }
   content.hidden = false;
 
-  // Placeholder unit pricing per format — align with launch pricing later.
-  const PRICES = { card: 19, sticker: 15, tent: 22, five7: 24 };
-  const BULK_MIN = 3;
-  const BULK_RATE = 0.2;
+  // $30 per tag (tax included), every 5th tag free ("5 for the price of 4").
+  // Must match api/create-checkout.js, which prices the real charge.
+  const UNIT_PRICE = 30;
+  const FREE_PER = 5;
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, (c) => ({
@@ -130,7 +130,6 @@
   const discountLine = document.getElementById("discount-line");
   const discountEl = document.getElementById("discount");
   const totalEl = document.getElementById("total");
-  const unitPrice = PRICES[order.format] || 19;
 
   const fmt = (n) => `$${n.toFixed(2)}`;
 
@@ -141,14 +140,15 @@
 
   function updateTotals() {
     const n = qty();
-    const subtotal = unitPrice * n;
-    const discount = n >= BULK_MIN ? subtotal * BULK_RATE : 0;
-    unitEl.textContent = `× ${fmt(unitPrice)} each`;
+    const freeUnits = Math.floor(n / FREE_PER);
+    const subtotal = UNIT_PRICE * n;
+    const discount = UNIT_PRICE * freeUnits;
+    unitEl.textContent = `× ${fmt(UNIT_PRICE)} each`;
     subtotalEl.textContent = fmt(subtotal);
     discountLine.hidden = discount === 0;
     discountEl.textContent = `−${fmt(discount)}`;
     totalEl.textContent = fmt(subtotal - discount);
-    document.getElementById("pay-btn").textContent = `Place order · ${fmt(subtotal - discount)}`;
+    document.getElementById("pay-btn").textContent = `Pay with Stripe · ${fmt(subtotal - discount)}`;
   }
 
   qtyInput.addEventListener("input", updateTotals);
@@ -199,7 +199,7 @@
     } catch (err) {
       msg.textContent = "Couldn't start checkout — please try again in a minute.";
       payBtn.disabled = false;
-      payBtn.textContent = "Pay with Stripe";
+      updateTotals();
     }
   });
 
