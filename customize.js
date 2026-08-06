@@ -1,4 +1,4 @@
-// boop. design studio — live tag customizer (all client-side)
+// boop. design studio — templates + live tag customizer (all client-side)
 
 (function () {
   "use strict";
@@ -33,11 +33,71 @@
     },
   };
 
+  // ---------- Templates: curated starting points ----------
+  // bg/accent are applied through the "custom" color slot so every
+  // template stays fully editable with the controls below the gallery.
+  const TEMPLATES = [
+    {
+      key: "bistro", label: "The Bistro", desc: "A menu on every table, updated from your phone.",
+      thumbName: "Café Norte",
+      format: "tent", usecase: "menu", bg: "#FAF3E7", accent: "#C4532D", style: "band",
+    },
+    {
+      key: "tipjar", label: "The Tip Jar", desc: "Cash-free tips for counters, cases, and stages.",
+      thumbName: "Tips for Alex", callout: "Tap to tip",
+      format: "sticker", usecase: "pay", bg: "#0A0F1E", accent: "#22D3EE", style: "band",
+    },
+    {
+      key: "closer", label: "The Closer", desc: "A business card nobody can lose.",
+      thumbName: "Jordan Lee",
+      format: "card", usecase: "bizcard", bg: "#ffffff", accent: "#2563EB", style: "frame",
+    },
+    {
+      key: "fivestar", label: "The Five-Star", desc: "Turn happy customers into Google reviews.",
+      thumbName: "Blue Door Salon", callout: "★★★★★ Tap to review",
+      format: "sticker", usecase: "review", bg: "#ffffff", accent: "#F59E0B", style: "band",
+    },
+    {
+      key: "guestpass", label: "The Guest Pass", desc: "Wi-Fi without spelling out the password.",
+      thumbName: "Studio K", callout: "Tap for guest Wi-Fi",
+      format: "card", usecase: "wifi", bg: "#2563EB", accent: "#0A0F1E", style: "split",
+    },
+    {
+      key: "maincharacter", label: "The Main Character", desc: "Grow your following in real life.",
+      thumbName: "@cornercafe", callout: "Follow us on Instagram",
+      format: "sticker", usecase: "instagram", bg: "#7C3AED", accent: "#22D3EE", style: "band",
+    },
+  ];
+
+  const QR_SVG = `
+    <svg class="pv-qr" viewBox="0 0 40 40" aria-hidden="true"><g fill="currentColor">
+      <rect x="0" y="0" width="12" height="12" rx="2"/><rect x="3" y="3" width="6" height="6" class="qr-hole" rx="1"/>
+      <rect x="28" y="0" width="12" height="12" rx="2"/><rect x="31" y="3" width="6" height="6" class="qr-hole" rx="1"/>
+      <rect x="0" y="28" width="12" height="12" rx="2"/><rect x="3" y="31" width="6" height="6" class="qr-hole" rx="1"/>
+      <rect x="17" y="0" width="5" height="5"/><rect x="17" y="9" width="5" height="5"/>
+      <rect x="17" y="18" width="5" height="5"/><rect x="26" y="18" width="5" height="5"/>
+      <rect x="35" y="18" width="5" height="5"/><rect x="17" y="27" width="5" height="5"/>
+      <rect x="26" y="27" width="5" height="5"/><rect x="35" y="30" width="5" height="5"/>
+      <rect x="17" y="35" width="5" height="5"/><rect x="28" y="35" width="5" height="5" opacity=".6"/>
+      <rect x="8" y="17" width="5" height="5"/><rect x="0" y="17" width="5" height="5" opacity=".6"/>
+    </g></svg>`;
+
+  const NFC_SVG = `
+    <svg class="pv-nfc" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M6 9c1.5 1.8 1.5 4.2 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/>
+      <path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+    </svg>`;
+
   const state = {
     format: "card",
     usecase: "menu",
     color: "#ffffff",
+    style: "classic",
+    accent: "#2563EB",
     customText: "",
+    calloutOverride: null,
+    templateLabel: null,
     name: "",
     logo: null,
   };
@@ -47,13 +107,18 @@
     return el ? el.value : null;
   }
 
+  function setRadio(name, value) {
+    const el = document.querySelector(`input[name="${name}"][value="${value}"]`);
+    if (el) el.checked = true;
+  }
+
   function resolveColor() {
     return state.color === "custom"
       ? document.getElementById("custom-color").value
       : state.color;
   }
 
-  // Pick a readable foreground (ink or white) for the chosen background.
+  // Pick a readable foreground (ink or white) for a given background.
   function fgFor(hex) {
     const n = hex.replace("#", "");
     const r = parseInt(n.slice(0, 2), 16);
@@ -63,19 +128,21 @@
     return luminance > 150 ? "#0A0F1E" : "#ffffff";
   }
 
+  function calloutText() {
+    if (state.usecase === "custom") return state.customText || CALLOUTS.custom;
+    return state.calloutOverride || CALLOUTS[state.usecase];
+  }
+
   function render() {
     const bg = resolveColor();
-    preview.className = `preview-tag format-${state.format}`;
+    preview.className = `preview-tag format-${state.format} style-${state.style}`;
     preview.style.setProperty("--pv-bg", bg);
     preview.style.setProperty("--pv-fg", fgFor(bg));
+    preview.style.setProperty("--pv-accent", state.accent);
+    preview.style.setProperty("--pv-accent-fg", fgFor(state.accent));
 
     pvName.textContent = state.name || "Your Business";
-
-    const callout =
-      state.usecase === "custom" && state.customText
-        ? state.customText
-        : CALLOUTS[state.usecase];
-    pvCallout.textContent = callout;
+    pvCallout.textContent = calloutText();
 
     if (state.logo) {
       pvLogo.src = state.logo;
@@ -86,24 +153,88 @@
     }
 
     const colorLabel = LABELS.color[bg] || bg.toUpperCase();
-    caption.textContent = `${LABELS.format[state.format]} · ${LABELS.usecase[state.usecase]} · ${colorLabel}`;
+    const parts = [LABELS.format[state.format], LABELS.usecase[state.usecase], colorLabel];
+    if (state.templateLabel) parts.unshift(state.templateLabel);
+    caption.textContent = parts.join(" · ");
   }
 
-  // ---------- Format & use case ----------
+  // ---------- Template gallery ----------
+  const tplGrid = document.getElementById("tpl-grid");
+
+  function thumbMarkup(t) {
+    return `
+      <span class="tpl-thumb">
+        <span class="preview-tag format-${t.format} style-${t.style}"
+              style="--pv-bg:${t.bg};--pv-fg:${fgFor(t.bg)};--pv-accent:${t.accent};--pv-accent-fg:${fgFor(t.accent)}">
+          <span class="pv-brand"><span class="pv-name">${t.thumbName}</span></span>
+          <span class="pv-callout">${t.callout || CALLOUTS[t.usecase]}</span>
+          <span class="pv-bottom">${QR_SVG}${NFC_SVG}</span>
+        </span>
+      </span>
+      <span class="tpl-label">${t.label}</span>
+      <span class="tpl-desc">${t.desc}</span>`;
+  }
+
+  const accentWrap = document.getElementById("accent-wrap");
+  const customWrap = document.getElementById("custom-callout-wrap");
+  const customText = document.getElementById("custom-callout");
+  const customColor = document.getElementById("custom-color");
+
+  function deselectTemplates() {
+    state.templateLabel = null;
+    tplGrid.querySelectorAll(".tpl-card").forEach((b) => b.setAttribute("aria-pressed", "false"));
+  }
+
+  function applyTemplate(t, button) {
+    state.format = t.format;
+    state.usecase = t.usecase;
+    state.style = t.style;
+    state.accent = t.accent;
+    state.color = "custom";
+    customColor.value = t.bg;
+    state.calloutOverride = t.callout || null;
+    state.customText = "";
+    state.templateLabel = t.label;
+
+    setRadio("format", t.format);
+    setRadio("usecase", t.usecase);
+    setRadio("style", t.style);
+    setRadio("accent", t.accent);
+    setRadio("color", "custom");
+    customWrap.hidden = true;
+    accentWrap.hidden = t.style === "classic";
+
+    tplGrid.querySelectorAll(".tpl-card").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    button.setAttribute("aria-pressed", "true");
+    render();
+  }
+
+  TEMPLATES.forEach((t) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "tpl-card";
+    button.setAttribute("aria-pressed", "false");
+    button.innerHTML = thumbMarkup(t);
+    button.addEventListener("click", () => applyTemplate(t, button));
+    tplGrid.appendChild(button);
+  });
+
+  // ---------- Format, use case, style ----------
   document.querySelectorAll('input[name="format"]').forEach((el) =>
     el.addEventListener("change", () => {
       state.format = checked("format");
+      deselectTemplates();
       render();
     })
   );
 
-  const customWrap = document.getElementById("custom-callout-wrap");
-  const customText = document.getElementById("custom-callout");
   document.querySelectorAll('input[name="usecase"]').forEach((el) =>
     el.addEventListener("change", () => {
       state.usecase = checked("usecase");
+      state.calloutOverride = null;
       customWrap.hidden = state.usecase !== "custom";
       if (state.usecase === "custom") customText.focus();
+      deselectTemplates();
       render();
     })
   );
@@ -112,17 +243,35 @@
     render();
   });
 
+  document.querySelectorAll('input[name="style"]').forEach((el) =>
+    el.addEventListener("change", () => {
+      state.style = checked("style");
+      accentWrap.hidden = state.style === "classic";
+      deselectTemplates();
+      render();
+    })
+  );
+
+  document.querySelectorAll('input[name="accent"]').forEach((el) =>
+    el.addEventListener("change", () => {
+      state.accent = checked("accent");
+      deselectTemplates();
+      render();
+    })
+  );
+
   // ---------- Color ----------
-  const customColor = document.getElementById("custom-color");
   document.querySelectorAll('input[name="color"]').forEach((el) =>
     el.addEventListener("change", () => {
       state.color = checked("color");
+      deselectTemplates();
       render();
     })
   );
   customColor.addEventListener("input", () => {
-    document.querySelector('input[name="color"][value="custom"]').checked = true;
+    setRadio("color", "custom");
     state.color = "custom";
+    deselectTemplates();
     render();
   });
 
@@ -173,7 +322,7 @@
       msg.textContent = "Hmm, that doesn't look like an email — try again?";
       return;
     }
-    // TODO: POST { ...state, email } to your backend / order form service.
+    // TODO: POST { ...state, bg: resolveColor(), email } to your backend.
     // state.logo holds the uploaded image as a data URL.
     msg.textContent = `Got it! We'll send a proof of your ${LABELS.format[state.format].toLowerCase()} (${LABELS.usecase[state.usecase]}) to ${email}. ✓`;
   });

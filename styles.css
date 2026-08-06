@@ -809,6 +809,61 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
   max-width: 32rem;
 }
 
+/* ---------- Template gallery ---------- */
+.templates { background: var(--paper); padding: 3.5rem 0 0.5rem; }
+.tpl-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.tpl-card {
+  font-family: var(--font-body);
+  text-align: left;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 0 1.1rem 1.1rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.tpl-card:hover {
+  border-color: var(--blue);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(10, 15, 30, 0.08);
+}
+.tpl-card[aria-pressed="true"] {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue), 0 16px 36px rgba(37, 99, 235, 0.12);
+}
+.tpl-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.tpl-thumb .preview-tag {
+  transform: scale(0.5);
+  flex-shrink: 0;
+  box-shadow: 0 12px 28px rgba(10, 15, 30, 0.22);
+}
+.tpl-label {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--ink);
+}
+.tpl-desc {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+  line-height: 1.45;
+}
+
 .customizer { padding: 4rem 0 5.5rem; background: var(--paper); }
 .customizer-grid {
   display: grid;
@@ -903,6 +958,44 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
 }
 .pv-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
 .format-sticker .pv-bottom { justify-content: center; gap: 0.9rem; align-items: center; }
+
+/* Tag style variants (used by templates and the Style control) */
+.preview-tag.style-band .pv-callout {
+  background: var(--pv-accent, var(--blue));
+  color: var(--pv-accent-fg, #fff);
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  align-self: flex-start;
+  opacity: 1;
+}
+.format-sticker.style-band .pv-callout { align-self: center; }
+
+.preview-tag.style-frame::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 1.5px solid var(--pv-accent, var(--blue));
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.85;
+}
+.preview-tag.style-frame { padding: 26px; }
+
+.preview-tag.style-split .pv-bottom {
+  /* re-scoping --pv-bg makes the QR "holes" match the accent strip */
+  --pv-bg: var(--pv-accent, var(--blue));
+  background: var(--pv-accent, var(--blue));
+  color: var(--pv-accent-fg, #fff);
+  margin: 0 -20px -20px;
+  padding: 12px 20px 14px;
+}
+.format-card.style-split .pv-bottom { border-radius: 0 0 17px 17px; }
+.format-tent.style-split .pv-bottom { border-radius: 0 0 3px 3px; }
+.format-sticker.style-split .pv-bottom {
+  margin: 0;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+}
 .pv-qr { width: 54px; height: 54px; }
 .pv-qr .qr-hole { fill: var(--pv-bg); }
 .pv-nfc { width: 26px; height: 26px; }

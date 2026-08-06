@@ -36,6 +36,17 @@
       </div>
     </section>
 
+    <section class="templates">
+      <div class="container">
+        <p class="eyebrow">Quick start</p>
+        <h2>Start from a template</h2>
+        <p class="section-sub">Pick what you're trying to do, drop in your name and logo, and you're done. Every template stays fully editable below.</p>
+        <div class="tpl-grid" id="tpl-grid">
+          <!-- Template cards are rendered by customize.js from the TEMPLATES list -->
+        </div>
+      </div>
+    </section>
+
     <section class="customizer">
       <div class="container customizer-grid">
 
@@ -119,7 +130,28 @@
           </div>
 
           <div class="opt-group">
-            <h3 class="opt-title">4. Branding</h3>
+            <h3 class="opt-title">4. Style</h3>
+            <div class="pill-row" role="radiogroup" aria-label="Style">
+              <label class="pill"><input type="radio" name="style" value="classic" checked /><span>Classic</span></label>
+              <label class="pill"><input type="radio" name="style" value="band" /><span>Band</span></label>
+              <label class="pill"><input type="radio" name="style" value="frame" /><span>Frame</span></label>
+              <label class="pill"><input type="radio" name="style" value="split" /><span>Split</span></label>
+            </div>
+            <div class="opt-sub" id="accent-wrap" hidden>
+              <label class="field-label">Accent color</label>
+              <div class="swatch-row" role="radiogroup" aria-label="Accent color">
+                <label class="swatch" style="--sw: #2563EB"><input type="radio" name="accent" value="#2563EB" checked /><span class="visually-hidden">Electric blue</span></label>
+                <label class="swatch" style="--sw: #22D3EE"><input type="radio" name="accent" value="#22D3EE" /><span class="visually-hidden">Cyan</span></label>
+                <label class="swatch" style="--sw: #F59E0B"><input type="radio" name="accent" value="#F59E0B" /><span class="visually-hidden">Gold</span></label>
+                <label class="swatch" style="--sw: #C4532D"><input type="radio" name="accent" value="#C4532D" /><span class="visually-hidden">Terracotta</span></label>
+                <label class="swatch" style="--sw: #7C3AED"><input type="radio" name="accent" value="#7C3AED" /><span class="visually-hidden">Purple</span></label>
+                <label class="swatch" style="--sw: #0A0F1E"><input type="radio" name="accent" value="#0A0F1E" /><span class="visually-hidden">Ink</span></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="opt-group">
+            <h3 class="opt-title">5. Branding</h3>
             <label class="field-label" for="biz-name">Business or personal name</label>
             <input type="text" id="biz-name" maxlength="24" placeholder="Your Business" />
 
@@ -133,7 +165,7 @@
           </div>
 
           <div class="opt-group opt-group-submit">
-            <h3 class="opt-title">5. Request this design</h3>
+            <h3 class="opt-title">6. Request this design</h3>
             <p class="opt-note">We're in early access — send us your design and we'll reach out with a proof and pricing.</p>
             <label class="visually-hidden" for="order-email">Email address</label>
             <div class="order-row">
