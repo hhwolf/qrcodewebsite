@@ -163,53 +163,59 @@
   });
   updateTotals();
 
-  // ---------- Card field niceties ----------
-  const cardInput = document.getElementById("co-card");
-  cardInput.addEventListener("input", () => {
-    const digits = cardInput.value.replace(/\D/g, "").slice(0, 16);
-    cardInput.value = digits.replace(/(\d{4})(?=\d)/g, "$1 ");
-  });
-  const expInput = document.getElementById("co-exp");
-  expInput.addEventListener("input", () => {
-    const digits = expInput.value.replace(/\D/g, "").slice(0, 4);
-    expInput.value = digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
-  });
-
-  // ---------- Place order (stub — swap for Stripe/your processor later) ----------
+  // ---------- Stripe Checkout ----------
   const form = document.getElementById("pay-form");
   const msg = document.getElementById("pay-msg");
+  const payBtn = document.getElementById("pay-btn");
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById("co-email").value.trim();
-    const name = document.getElementById("co-name").value.trim();
-    const address = document.getElementById("co-address").value.trim();
-    const city = document.getElementById("co-city").value.trim();
-    const zip = document.getElementById("co-zip").value.trim();
-    const card = cardInput.value.replace(/\s/g, "");
-    const exp = expInput.value;
-    const cvc = document.getElementById("co-cvc").value.trim();
+    msg.textContent = "";
+    payBtn.disabled = true;
+    payBtn.textContent = "Opening secure checkout…";
+    try {
+      const res = await fetch("/api/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          format: order.format,
+          usecase: order.usecase,
+          qty: qty(),
+          design: {
+            name: order.name,
+            callout: order.callout,
+            bg: order.bg,
+            accent: order.accent,
+            style: order.style,
+            back: order.singleSided ? "single-sided" : order.back,
+            backCallout: order.backCallout,
+            hasLogo: Boolean(order.logo),
+          },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || "Checkout failed");
+      window.location.href = data.url; // off to Stripe's hosted payment page
+    } catch (err) {
+      msg.textContent = "Couldn't start checkout — please try again in a minute.";
+      payBtn.disabled = false;
+      payBtn.textContent = "Pay with Stripe";
+    }
+  });
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return fail("That email doesn't look right.");
-    if (!name || !address || !city || !zip) return fail("Please fill in your shipping details.");
-    if (card.length < 15) return fail("That card number looks too short.");
-    if (!/^\d{2}\/\d{2}$/.test(exp)) return fail("Expiry should be MM/YY.");
-    if (!/^\d{3,4}$/.test(cvc)) return fail("CVC should be 3–4 digits.");
-
-    // TODO: replace with a real payment flow (e.g. Stripe Checkout) and POST
-    // the order (localStorage "boopOrder" + qty + shipping) to your backend.
-    const orderId = "BOOP-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+  // ---------- Returning from Stripe ----------
+  const status = new URLSearchParams(window.location.search).get("status");
+  if (status === "success") {
     form.innerHTML = `
       <div class="co-success">
         <div class="co-success-check">✓</div>
         <h3>Order received!</h3>
-        <p class="co-success-id">${orderId}</p>
-        <p>Thanks, ${esc(name.split(" ")[0])}! We've got your ${qty()} × ${esc(order.formatLabel.toLowerCase())}
-        (${esc(order.usecaseLabel)}) design. This is a demo checkout — no card was charged.
-        We'll email <strong>${esc(email)}</strong> with a proof and a real invoice.</p>
+        <p>Thanks! Your payment went through — Stripe is emailing your receipt now.
+        We'll be in touch${order.logo ? " (and we'll ask for your logo file)" : ""} with a
+        proof of your ${esc(order.formatLabel.toLowerCase())} before it prints.</p>
         <a class="btn btn-outline" href="customize.html">Design another</a>
       </div>`;
-
-    function fail(text) { msg.textContent = text; }
-  });
+  } else if (status === "cancel") {
+    msg.textContent = "Payment canceled — no charge was made. Your design is saved, so you can pay whenever you're ready.";
+  }
 })();

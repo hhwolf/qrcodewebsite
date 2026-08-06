@@ -1553,6 +1553,13 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
   padding: 0.6rem 0.9rem;
 }
 
+.stripe-note {
+  margin-top: 0.9rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+}
+
 /* Success state */
 .co-success { text-align: center; padding: 1rem 0; }
 .co-success-check {
