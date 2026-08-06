@@ -23,6 +23,7 @@
   // Must match api/create-checkout.js, which prices the real charge.
   const UNIT_PRICE = 30;
   const FREE_PER = 5;
+  const SHIPPING = 10; // flat, matches the Stripe shipping option
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, (c) => ({
@@ -147,8 +148,9 @@
     subtotalEl.textContent = fmt(subtotal);
     discountLine.hidden = discount === 0;
     discountEl.textContent = `−${fmt(discount)}`;
-    totalEl.textContent = fmt(subtotal - discount);
-    document.getElementById("pay-btn").textContent = `Pay with Stripe · ${fmt(subtotal - discount)}`;
+    const total = subtotal - discount + SHIPPING;
+    totalEl.textContent = fmt(total);
+    document.getElementById("pay-btn").textContent = `Pay with Stripe · ${fmt(total)}`;
   }
 
   qtyInput.addEventListener("input", updateTotals);
