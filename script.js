@@ -58,7 +58,7 @@
 
       const success = () => {
         form.style.display = "none";
-        msg.textContent = "You're on the list! We'll boop you exactly once, at launch. ✓";
+        msg.textContent = "Message sent — we'll get back to you within a day. ✓";
       };
 
       if (!SIGNUP_ENDPOINT) {
@@ -66,21 +66,22 @@
         return;
       }
 
+      const message = form.message ? form.message.value.trim() : "";
       const button = form.querySelector("button");
       button.disabled = true;
-      button.textContent = "Joining…";
+      button.textContent = "Sending…";
       try {
         const res = await fetch(SIGNUP_ENDPOINT, {
           method: "POST",
           headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify({ email, source: "landing-early-access" }),
+          body: JSON.stringify({ email, message, source: "landing-contact" }),
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         success();
       } catch (err) {
         msg.textContent = "Something went wrong — please try again in a minute.";
         button.disabled = false;
-        button.textContent = "Get early access";
+        button.textContent = "Send message";
       }
     });
   }
