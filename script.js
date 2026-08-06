@@ -43,7 +43,7 @@
   // ---------- Email capture ----------
   // Formspree endpoint, e.g. "https://formspree.io/f/xanyzabc".
   // Leave empty to fall back to demo mode (shows success without sending).
-  const SIGNUP_ENDPOINT = "";
+  const SIGNUP_ENDPOINT = "https://formspree.io/f/xljreono";
 
   const form = document.getElementById("signup-form");
   const msg = document.getElementById("form-msg");
