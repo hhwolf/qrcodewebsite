@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>boop 5×7 counter display designs — print masters</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  /* Print masters: each sheet is exactly 5in × 7in, no bleed, no frame.
+     The QR area is a placement guide — drop the customer's QR code there. */
+  @page { size: 5in 7in; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Inter", sans-serif; background: #fff; }
+
+  .sheet {
+    width: 5in;
+    height: 7in;
+    background: #fff;
+    color: #14161c;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    page-break-after: always;
+    position: relative;
+  }
+
+  .band {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 0.72in;
+    padding: 0 0.42in 0 0.42in;
+    background: var(--accent);
+    color: var(--accent-fg);
+  }
+  .band-label { font-size: 10.5pt; font-weight: 700; letter-spacing: 0.22em; }
+  .band-dot {
+    width: 0.17in;
+    height: 0.17in;
+    border-radius: 50%;
+    background: var(--accent-fg);
+    box-shadow: 0 0 0 0.045in color-mix(in srgb, var(--accent-fg), transparent 62%);
+  }
+
+  .headline {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: 34pt;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    padding: 0.34in 0.42in 0;
+  }
+  .sub {
+    font-size: 10.5pt;
+    line-height: 1.5;
+    color: #6a6f7a;
+    padding: 0.12in 0.42in 0;
+    max-width: 4.3in;
+  }
+
+  .extra { padding: 0.18in 0.42in 0; }
+  .stars { color: var(--accent); font-size: 21pt; letter-spacing: 0.12em; line-height: 1; }
+  .extra-line { display: block; font-size: 11pt; color: #3a3f49; margin-top: 0.08in; }
+  .extra-line strong { color: #14161c; }
+  .rule-line {
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: #8a8f99;
+    border-top: 1px solid #d9dce2;
+    padding-top: 0.06in;
+    margin-top: 0.14in;
+  }
+  .chips { display: flex; gap: 0.08in; }
+  .chip {
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    border: 1.4px solid #14161c;
+    border-radius: 999px;
+    padding: 0.05in 0.14in;
+  }
+
+  .row {
+    margin-top: auto;
+    display: flex;
+    gap: 0.16in;
+    align-items: stretch;
+    padding: 0 0.42in;
+  }
+  .qrbox {
+    width: 2.55in;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #14161c;
+    background: #fff;
+  }
+  .qrbox-head {
+    background: #14161c;
+    color: #fff;
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-align: center;
+    padding: 0.07in 0.05in;
+  }
+  .qrbox-body {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.2in;
+  }
+  .qrbox-body img { width: 1.75in; height: 1.75in; opacity: 0.1; }
+  .qr-note {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 9.5pt;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #9aa0ab;
+    line-height: 1.6;
+  }
+  .tappanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.05in;
+    background: var(--accent);
+    color: var(--accent-fg);
+    border-radius: 0.13in;
+  }
+  .tappanel svg { width: 0.55in; height: 0.55in; transform: rotate(90deg); margin-bottom: 0.06in; }
+  .tap-word { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 17pt; letter-spacing: 0.1em; }
+  .tap-hint { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.18em; }
+
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0.2in 0.42in 0;
+    padding: 0.1in 0 0.3in;
+    border-top: 1.6px solid #14161c;
+  }
+  .foot-boop { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 11pt; }
+
+  /* Per-design accents (ink text on gold; white on the rest) */
+  #review { --accent: #F5A623; --accent-fg: #14161c; }
+  #social { --accent: #E01583; --accent-fg: #ffffff; }
+  #pay    { --accent: #1F8A63; --accent-fg: #ffffff; }
+  #wifi   { --accent: #2547EB; --accent-fg: #ffffff; }
+  #menu   { --accent: #5B21B6; --accent-fg: #ffffff; }
+</style>
+</head>
+<body>
+
+<div class="sheet" id="review">
+  <div class="band"><span class="band-label">THIRTY SECONDS, TOPS</span><span class="band-dot"></span></div>
+  <div class="headline">How did<br />we do?</div>
+  <p class="sub">A review on Google helps a small shop more than almost anything else. Thank you.</p>
+  <div class="extra">
+    <span class="stars">★★★★★</span>
+    <span class="extra-line">Leave a review on <strong>Google</strong></span>
+  </div>
+  <div class="row">
+    <div class="qrbox">
+      <div class="qrbox-head">SCAN TO REVIEW</div>
+      <div class="qrbox-body"><img src="../assets/sample-qr.svg" alt="" /><span class="qr-note">QR CODE<br />GOES HERE</span></div>
+    </div>
+    <div class="tappanel">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 9c1.5 1.8 1.5 4.2 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/><path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/></svg>
+      <span class="tap-word">TAP</span>
+      <span class="tap-hint">HOLD PHONE HERE</span>
+    </div>
+  </div>
+  <div class="foot"><span class="foot-boop">boop</span></div>
+</div>
+
+<div class="sheet" id="social">
+  <div class="band"><span class="band-label">FOLLOW ALONG</span><span class="band-dot"></span></div>
+  <div class="headline">See what's<br />new here.</div>
+  <p class="sub">Specials, new arrivals and today's hours land on our page first.</p>
+  <div class="extra">
+    <div class="chips"><span class="chip">INSTAGRAM</span><span class="chip">FACEBOOK</span><span class="chip">TIKTOK</span></div>
+  </div>
+  <div class="row">
+    <div class="qrbox">
+      <div class="qrbox-head">SCAN TO FOLLOW</div>
+      <div class="qrbox-body"><img src="../assets/sample-qr.svg" alt="" /><span class="qr-note">QR CODE<br />GOES HERE</span></div>
+    </div>
+    <div class="tappanel">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 9c1.5 1.8 1.5 4.2 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/><path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/></svg>
+      <span class="tap-word">TAP</span>
+      <span class="tap-hint">HOLD PHONE HERE</span>
+    </div>
+  </div>
+  <div class="foot"><span class="foot-boop">boop</span></div>
+</div>
+
+<div class="sheet" id="pay">
+  <div class="band"><span class="band-label">PAY HERE</span><span class="band-dot"></span></div>
+  <div class="headline">Pay with<br />your phone.</div>
+  <p class="sub">Opens your checkout link straight in the browser. No app to download, no account to make.</p>
+  <div class="row">
+    <div class="qrbox">
+      <div class="qrbox-head">SCAN TO PAY</div>
+      <div class="qrbox-body"><img src="../assets/sample-qr.svg" alt="" /><span class="qr-note">QR CODE<br />GOES HERE</span></div>
+    </div>
+    <div class="tappanel">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 9c1.5 1.8 1.5 4.2 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/><path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/></svg>
+      <span class="tap-word">TAP</span>
+      <span class="tap-hint">HOLD PHONE HERE</span>
+    </div>
+  </div>
+  <div class="foot"><span class="foot-boop">boop</span></div>
+</div>
+
+<div class="sheet" id="wifi">
+  <div class="band"><span class="band-label">GUEST NETWORK</span><span class="band-dot"></span></div>
+  <div class="headline">Free wifi,<br />no typing.</div>
+  <p class="sub">The password is already inside the code. Scan it, or tap your phone on the panel.</p>
+  <div class="extra">
+    <div class="rule-line">NETWORK</div>
+    <div class="rule-line">PASSWORD</div>
+  </div>
+  <div class="row">
+    <div class="qrbox">
+      <div class="qrbox-head">SCAN TO CONNECT</div>
+      <div class="qrbox-body"><img src="../assets/sample-qr.svg" alt="" /><span class="qr-note">QR CODE<br />GOES HERE</span></div>
+    </div>
+    <div class="tappanel">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 9c1.5 1.8 1.5 4.2 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/><path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/></svg>
+      <span class="tap-word">TAP</span>
+      <span class="tap-hint">HOLD PHONE HERE</span>
+    </div>
+  </div>
+  <div class="foot"><span class="foot-boop">boop</span></div>
+</div>
+
+<div class="sheet" id="menu">
+  <div class="band"><span class="band-label">DIGITAL MENU</span><span class="band-dot"></span></div>
+  <div class="headline">View our<br />menu.</div>
+  <p class="sub">Tap or scan to open our digital menu with the latest items.</p>
+  <div class="row">
+    <div class="qrbox">
+      <div class="qrbox-head">SCAN TO VIEW MENU</div>
+      <div class="qrbox-body"><img src="../assets/sample-qr.svg" alt="" /><span class="qr-note">QR CODE<br />GOES HERE</span></div>
+    </div>
+    <div class="tappanel">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 9c1.5 1.8 1.5 4.2 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/><path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/></svg>
+      <span class="tap-word">TAP</span>
+      <span class="tap-hint">HOLD PHONE HERE</span>
+    </div>
+  </div>
+  <div class="foot"><span class="foot-boop">boop</span></div>
+</div>
+
+<script>
+  // Open with #review / #social / #pay / #wifi / #menu to isolate one sheet
+  // (used to print each design to its own PDF).
+  const only = window.location.hash.slice(1);
+  if (only) {
+    document.querySelectorAll(".sheet").forEach((s) => {
+      if (s.id !== only) s.style.display = "none";
+    });
+  }
+</script>
+</body>
+</html>

@@ -56,7 +56,7 @@
     wifi: { label: "GUEST NETWORK", sub: "The password is already inside the code. Scan it, or tap your phone on the panel.", scan: "SCAN TO CONNECT" },
     pay: { label: "PAY HERE", sub: "Opens your checkout link straight in the browser. No app to download, no account to make.", scan: "SCAN TO PAY" },
     instagram: { label: "FOLLOW ALONG", sub: "Specials, new arrivals and today's hours land on our page first.", scan: "SCAN TO FOLLOW" },
-    menu: { label: "TODAY'S MENU", sub: "Always current — prices and specials update the moment we change them.", scan: "SCAN FOR MENU" },
+    menu: { label: "DIGITAL MENU", sub: "Tap or scan to open our digital menu with the latest items.", scan: "SCAN TO VIEW MENU" },
     bizcard: { label: "LET'S CONNECT", sub: "Save the contact card straight to your phone.", scan: "SCAN TO SAVE" },
     custom: { label: "TAP OR SCAN", sub: "Tap your phone on the panel, or scan the code. It takes seconds.", scan: "SCAN ME" },
   };
@@ -88,11 +88,11 @@
       back: { mode: "qr-text", text: "Scan to leave a review" },
     },
     {
-      key: "wifi57", group: "cards57", label: "The Wi-Fi Display",
-      desc: "Guest Wi-Fi with the password inside the code.",
-      thumbName: "Studio K", callout: "Free wifi, no typing.",
-      format: "five7", usecase: "wifi", bg: "#ffffff", accent: "#2563EB", style: "classic",
-      back: { mode: "qr-text", text: "Scan to join the Wi-Fi" },
+      key: "social57", group: "cards57", label: "The Social Display",
+      desc: "Instagram, Facebook, and TikTok — one scan to follow.",
+      thumbName: "@cornercafe", callout: "See what's new here.",
+      format: "five7", usecase: "instagram", bg: "#ffffff", accent: "#E01583", style: "classic",
+      back: { mode: "qr-text", text: "Scan to follow" },
     },
     {
       key: "pay57", group: "cards57", label: "The Payment Display",
@@ -102,11 +102,18 @@
       back: { mode: "qr-text", text: "Scan to pay or tip" },
     },
     {
-      key: "social57", group: "cards57", label: "The Social Display",
-      desc: "Instagram, Facebook, and TikTok — one scan to follow.",
-      thumbName: "@cornercafe", callout: "See what's new here.",
-      format: "five7", usecase: "instagram", bg: "#ffffff", accent: "#E01583", style: "classic",
-      back: { mode: "qr-text", text: "Scan to follow" },
+      key: "wifi57", group: "cards57", label: "The Wi-Fi Display",
+      desc: "Guest Wi-Fi with the password inside the code.",
+      thumbName: "Studio K", callout: "Free wifi, no typing.",
+      format: "five7", usecase: "wifi", bg: "#ffffff", accent: "#2563EB", style: "classic",
+      back: { mode: "qr-text", text: "Scan to join the Wi-Fi" },
+    },
+    {
+      key: "menu57", group: "cards57", label: "The Menu Display",
+      desc: "Your digital menu, always current — no reprints.",
+      thumbName: "Café Norte", callout: "View our menu.",
+      format: "five7", usecase: "menu", bg: "#ffffff", accent: "#5B21B6", style: "classic",
+      back: { mode: "qr-text", text: "Scan for today's menu" },
     },
 
     // --- Tags & stickers ---
