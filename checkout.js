@@ -19,11 +19,13 @@
   }
   content.hidden = false;
 
-  // $30 per tag (tax included), every 5th tag free ("5 for the price of 4").
-  // Must match api/create-checkout.js, which prices the real charge.
-  const UNIT_PRICE = 30;
-  const FREE_PER = 5;
-  const SHIPPING = 10; // flat, matches the Stripe shipping option
+  // $29.99 per tag (tax included); every 4 tags bundle to $99.99.
+  // Cents math to avoid float drift. Must match api/create-checkout.js,
+  // which prices the real charge.
+  const UNIT_C = 2999;
+  const BUNDLE_SIZE = 4;
+  const BUNDLE_C = 9999;
+  const SHIPPING_C = 1000; // flat, matches the Stripe shipping option
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, (c) => ({
@@ -132,7 +134,7 @@
   const discountEl = document.getElementById("discount");
   const totalEl = document.getElementById("total");
 
-  const fmt = (n) => `$${n.toFixed(2)}`;
+  const fmt = (c) => `$${(c / 100).toFixed(2)}`;
 
   function qty() {
     const n = parseInt(qtyInput.value, 10);
@@ -141,14 +143,16 @@
 
   function updateTotals() {
     const n = qty();
-    const freeUnits = Math.floor(n / FREE_PER);
-    const subtotal = UNIT_PRICE * n;
-    const discount = UNIT_PRICE * freeUnits;
-    unitEl.textContent = `× ${fmt(UNIT_PRICE)} each`;
+    const bundles = Math.floor(n / BUNDLE_SIZE);
+    const singles = n % BUNDLE_SIZE;
+    const subtotal = UNIT_C * n;
+    const itemsTotal = bundles * BUNDLE_C + singles * UNIT_C;
+    const discount = subtotal - itemsTotal;
+    unitEl.textContent = `× ${fmt(UNIT_C)} each`;
     subtotalEl.textContent = fmt(subtotal);
     discountLine.hidden = discount === 0;
     discountEl.textContent = `−${fmt(discount)}`;
-    const total = subtotal - discount + SHIPPING;
+    const total = itemsTotal + SHIPPING_C;
     totalEl.textContent = fmt(total);
     document.getElementById("pay-btn").textContent = `Pay with Stripe · ${fmt(total)}`;
   }

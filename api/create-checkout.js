@@ -2,10 +2,11 @@
 // Price is computed server-side from whitelisted format keys — the client
 // never sets amounts. Stripe's hosted page collects card, email & shipping.
 
-// $30 per tag, tax included. Every 5th tag is free ("5 for the price of 4").
-// Shipping is collected/calculated on Stripe's payment page.
-const UNIT_AMOUNT = 3000; // cents
-const FREE_PER = 5;
+// $29.99 per tag, tax included; every 4 tags bundle to $99.99.
+// Flat $10 shipping is added as a Stripe shipping option.
+const UNIT_AMOUNT = 2999; // cents
+const BUNDLE_SIZE = 4;
+const BUNDLE_AMOUNT = 9999; // cents, per 4-pack
 const FORMATS = ["card", "sticker", "tent", "five7"];
 const FORMAT_LABELS = {
   card: "Card", sticker: "Sticker", tent: "Table tent", five7: "5×7 counter display",
@@ -26,8 +27,8 @@ export default async function handler(req, res) {
   if (!FORMATS.includes(format)) return res.status(400).json({ error: "Unknown format" });
 
   const quantity = Math.min(500, Math.max(1, parseInt(qty, 10) || 1));
-  const freeUnits = Math.floor(quantity / FREE_PER);
-  const paidUnits = quantity - freeUnits;
+  const bundles = Math.floor(quantity / BUNDLE_SIZE);
+  const singles = quantity % BUNDLE_SIZE;
   const name = `boop ${FORMAT_LABELS[format]} — ${USECASE_LABELS[usecase] || "Custom"}`;
 
   const origin = `https://${req.headers["x-forwarded-host"] || req.headers.host}`;
@@ -37,10 +38,6 @@ export default async function handler(req, res) {
     mode: "payment",
     success_url: `${origin}/checkout.html?status=success`,
     cancel_url: `${origin}/checkout.html?status=cancel`,
-    "line_items[0][quantity]": String(paidUnits),
-    "line_items[0][price_data][currency]": "usd",
-    "line_items[0][price_data][unit_amount]": String(UNIT_AMOUNT),
-    "line_items[0][price_data][product_data][name]": name,
     "shipping_address_collection[allowed_countries][0]": "US",
     "shipping_address_collection[allowed_countries][1]": "CA",
     "shipping_options[0][shipping_rate_data][type]": "fixed_amount",
@@ -62,12 +59,20 @@ export default async function handler(req, res) {
     "payment_intent_data[metadata][business_name]": meta(d.name),
   });
 
-  // Every 5th tag rides along free, as its own $0 line so the receipt shows it.
-  if (freeUnits > 0) {
-    params.append("line_items[1][quantity]", String(freeUnits));
-    params.append("line_items[1][price_data][currency]", "usd");
-    params.append("line_items[1][price_data][unit_amount]", "0");
-    params.append("line_items[1][price_data][product_data][name]", `${name} (5-for-4 bonus tag)`);
+  // Every 4 tags ring up as a $99.99 bundle; the remainder are singles.
+  let li = 0;
+  if (bundles > 0) {
+    params.append(`line_items[${li}][quantity]`, String(bundles));
+    params.append(`line_items[${li}][price_data][currency]`, "usd");
+    params.append(`line_items[${li}][price_data][unit_amount]`, String(BUNDLE_AMOUNT));
+    params.append(`line_items[${li}][price_data][product_data][name]`, `${name} — 4-pack`);
+    li++;
+  }
+  if (singles > 0) {
+    params.append(`line_items[${li}][quantity]`, String(singles));
+    params.append(`line_items[${li}][price_data][currency]`, "usd");
+    params.append(`line_items[${li}][price_data][unit_amount]`, String(UNIT_AMOUNT));
+    params.append(`line_items[${li}][price_data][product_data][name]`, name);
   }
 
   try {
