@@ -52,7 +52,14 @@
 
         <!-- ============ LIVE PREVIEW ============ -->
         <div class="preview-panel">
+          <div class="pv-tabs">
+            <button type="button" class="pv-tab pv-tab-active" id="tab-front">Front</button>
+            <button type="button" class="pv-tab" id="tab-back">Back</button>
+          </div>
           <div class="preview-stage">
+            <div class="flip-scene">
+              <div class="flip-inner" id="flip-inner">
+                <div class="flip-face flip-front">
             <div class="preview-tag format-card" id="preview">
               <div class="pv-brand">
                 <img id="pv-logo" alt="" hidden />
@@ -78,6 +85,28 @@
                   <path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/>
                   <path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/>
                 </svg>
+              </div>
+            </div>
+                </div>
+                <div class="flip-face flip-back">
+                  <div class="preview-tag pv-back format-card back-qr-text" id="preview-back">
+                    <span class="pv-back-name" id="pv-back-name">Your Business</span>
+                    <svg class="pv-qr pv-qr-big" viewBox="0 0 40 40" aria-hidden="true">
+                      <g fill="currentColor">
+                        <rect x="0" y="0" width="12" height="12" rx="2"/><rect x="3" y="3" width="6" height="6" class="qr-hole" rx="1"/>
+                        <rect x="28" y="0" width="12" height="12" rx="2"/><rect x="31" y="3" width="6" height="6" class="qr-hole" rx="1"/>
+                        <rect x="0" y="28" width="12" height="12" rx="2"/><rect x="3" y="31" width="6" height="6" class="qr-hole" rx="1"/>
+                        <rect x="17" y="0" width="5" height="5"/><rect x="17" y="9" width="5" height="5"/>
+                        <rect x="17" y="18" width="5" height="5"/><rect x="26" y="18" width="5" height="5"/>
+                        <rect x="35" y="18" width="5" height="5"/><rect x="17" y="27" width="5" height="5"/>
+                        <rect x="26" y="27" width="5" height="5"/><rect x="35" y="30" width="5" height="5"/>
+                        <rect x="17" y="35" width="5" height="5"/><rect x="28" y="35" width="5" height="5" opacity=".6"/>
+                        <rect x="8" y="17" width="5" height="5"/><rect x="0" y="17" width="5" height="5" opacity=".6"/>
+                      </g>
+                    </svg>
+                    <span class="pv-back-callout" id="pv-back-callout">Tap or scan</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -150,8 +179,21 @@
             </div>
           </div>
 
+          <div class="opt-group" id="back-group">
+            <h3 class="opt-title">5. Back of tag</h3>
+            <div class="pill-row" role="radiogroup" aria-label="Back of tag">
+              <label class="pill"><input type="radio" name="back" value="qr-text" checked /><span>Big QR + text</span></label>
+              <label class="pill"><input type="radio" name="back" value="qr" /><span>QR only</span></label>
+              <label class="pill"><input type="radio" name="back" value="blank" /><span>Blank</span></label>
+            </div>
+            <div class="opt-sub" id="back-text-wrap">
+              <label class="field-label" for="back-text">Back text</label>
+              <input type="text" id="back-text" maxlength="32" placeholder="e.g. Scan to see the menu" />
+            </div>
+          </div>
+
           <div class="opt-group">
-            <h3 class="opt-title">5. Branding</h3>
+            <h3 class="opt-title">6. Branding</h3>
             <label class="field-label" for="biz-name">Business or personal name</label>
             <input type="text" id="biz-name" maxlength="24" placeholder="Your Business" />
 
@@ -165,7 +207,7 @@
           </div>
 
           <div class="opt-group opt-group-submit">
-            <h3 class="opt-title">6. Request this design</h3>
+            <h3 class="opt-title">7. Request this design</h3>
             <p class="opt-note">We're in early access — send us your design and we'll reach out with a proof and pricing.</p>
             <label class="visually-hidden" for="order-email">Email address</label>
             <div class="order-row">
