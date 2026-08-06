@@ -89,4 +89,22 @@
   // ---------- Footer year ----------
   const year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
+
+  // ---------- Clean anchors: scroll without #fragments in the URL ----------
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest('a[href*="#"]');
+    if (!link) return;
+    const url = new URL(link.getAttribute("href"), window.location.href);
+    if (url.pathname !== window.location.pathname) return; // cross-page link — navigate normally
+    const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
+  });
+
+  // Arriving with a hash (e.g. /#contact from another page): the browser has
+  // already jumped to the section — just remove the fragment from the URL.
+  if (window.location.hash) {
+    history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
 })();
