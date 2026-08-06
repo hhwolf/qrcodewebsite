@@ -38,7 +38,7 @@
   };
 
   const LABELS = {
-    format: { card: "Card", sticker: "Sticker", tent: "Table tent" },
+    format: { card: "Card", sticker: "Sticker", tent: "Table tent", five7: "5×7 card" },
     usecase: {
       menu: "Menu", wifi: "Wi-Fi", pay: "Pay / tips", bizcard: "Business card",
       review: "Google review", instagram: "Instagram", custom: "Custom link",
@@ -54,6 +54,44 @@
   // stays fully editable. `back` designs the reverse side of cards and
   // tents; stickers are single-sided, so their templates have no back.
   const TEMPLATES = [
+    // --- 5×7 counter cards (printed 5″×7″, 2″×2″ zone for a boop QR sticker) ---
+    {
+      key: "review57", group: "cards57", label: "The Review Card",
+      desc: "Counter card that turns happy customers into Google reviews.",
+      thumbName: "Blue Door Salon", callout: "How did we do?",
+      format: "five7", usecase: "review", bg: "#ffffff", accent: "#F59E0B", style: "band",
+      back: { mode: "qr-text", text: "Scan to leave a review" },
+    },
+    {
+      key: "wifi57", group: "cards57", label: "The Wi-Fi Card",
+      desc: "Guest Wi-Fi at the front desk — no password spelling.",
+      thumbName: "Studio K", callout: "Guest Wi-Fi",
+      format: "five7", usecase: "wifi", bg: "#2563EB", accent: "#0A0F1E", style: "classic",
+      back: { mode: "qr-text", text: "Scan to join the Wi-Fi" },
+    },
+    {
+      key: "menu57", group: "cards57", label: "The Menu Card",
+      desc: "A digital menu by the register or host stand.",
+      thumbName: "Café Norte", callout: "Our Menu",
+      format: "five7", usecase: "menu", bg: "#FAF3E7", accent: "#C4532D", style: "band",
+      back: { mode: "qr-text", text: "Scan for today's menu" },
+    },
+    {
+      key: "social57", group: "cards57", label: "The Social Card",
+      desc: "Instagram and social links, growing your following IRL.",
+      thumbName: "@cornercafe", callout: "Follow us",
+      format: "five7", usecase: "instagram", bg: "#7C3AED", accent: "#22D3EE", style: "classic",
+      back: { mode: "qr-text", text: "Scan to follow" },
+    },
+    {
+      key: "pay57", group: "cards57", label: "The Payment Card",
+      desc: "Payments and tips, cash-free at the counter.",
+      thumbName: "Tips for Alex", callout: "Pay or tip here",
+      format: "five7", usecase: "pay", bg: "#0A0F1E", accent: "#22D3EE", style: "band",
+      back: { mode: "qr-text", text: "Scan to pay or tip" },
+    },
+
+    // --- Tags & stickers ---
     {
       key: "bistro", label: "The Bistro", desc: "A menu on every table, updated from your phone.",
       thumbName: "Café Norte",
@@ -103,6 +141,12 @@
 
   const QR_SVG = `<svg class="pv-qr" viewBox="0 0 40 40" aria-hidden="true">${QR_SVG_INNER}</svg>`;
   const QR_SVG_BIG = `<svg class="pv-qr pv-qr-big" viewBox="0 0 40 40" aria-hidden="true">${QR_SVG_INNER}</svg>`;
+  const QR_SVG_GHOST = `<svg class="pv-qr pv-qr-ghost" viewBox="0 0 40 40" aria-hidden="true">${QR_SVG_INNER}</svg>`;
+  const STICKER_ZONE = `
+    <span class="pv-sticker-wrap">
+      <span class="pv-sticker-zone">${QR_SVG_GHOST}</span>
+      <span class="pv-zone-label">2″ × 2″ QR sticker</span>
+    </span>`;
 
   const NFC_SVG = `
     <svg class="pv-nfc" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -222,7 +266,10 @@
   tabBack.addEventListener("click", () => setView("back"));
 
   // ---------- Template gallery ----------
-  const tplGrid = document.getElementById("tpl-grid");
+  const tplGrids = {
+    tags: document.getElementById("tpl-grid"),
+    cards57: document.getElementById("tpl-grid-cards"),
+  };
 
   function frontFaceMarkup(t) {
     return `
@@ -230,6 +277,7 @@
             style="--pv-bg:${t.bg};--pv-fg:${fgFor(t.bg)};--pv-accent:${t.accent};--pv-accent-fg:${fgFor(t.accent)}">
         <span class="pv-brand"><span class="pv-name">${t.thumbName}</span></span>
         <span class="pv-callout">${t.callout || CALLOUTS[t.usecase]}</span>
+        ${t.format === "five7" ? STICKER_ZONE : ""}
         <span class="pv-bottom">${QR_SVG}${NFC_SVG}</span>
       </span>`;
   }
@@ -268,7 +316,7 @@
 
   function deselectTemplates() {
     state.templateLabel = null;
-    tplGrid.querySelectorAll(".tpl-card").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    document.querySelectorAll(".tpl-card").forEach((b) => b.setAttribute("aria-pressed", "false"));
   }
 
   function applyTemplate(t, button) {
@@ -298,7 +346,7 @@
     updateBackAvailability();
     setView("front");
 
-    tplGrid.querySelectorAll(".tpl-card").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    document.querySelectorAll(".tpl-card").forEach((b) => b.setAttribute("aria-pressed", "false"));
     button.setAttribute("aria-pressed", "true");
     render();
   }
@@ -310,7 +358,7 @@
     button.setAttribute("aria-pressed", "false");
     button.innerHTML = thumbMarkup(t);
     button.addEventListener("click", () => applyTemplate(t, button));
-    tplGrid.appendChild(button);
+    (tplGrids[t.group] || tplGrids.tags).appendChild(button);
   });
 
   // ---------- Format, use case, style, back ----------

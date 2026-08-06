@@ -811,11 +811,23 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
 
 /* ---------- Template gallery ---------- */
 .templates { background: var(--paper); padding: 3.5rem 0 0.5rem; }
+.tpl-group-title {
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  margin-top: 2.25rem;
+}
+.tpl-group-note {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: 0.4rem;
+}
 .tpl-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 .tpl-card {
   font-family: var(--font-body);
@@ -841,7 +853,7 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 150px;
+  height: 170px;
   overflow: hidden;
   pointer-events: none;
   perspective: 1200px;
@@ -1018,6 +1030,62 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
   height: 210px;
   border-radius: 14px 14px 4px 4px;
   margin-bottom: 18px;
+}
+/* 5×7 counter card — rendered at 44px per inch (220×308), with a
+   to-scale 2″×2″ (88px) drop zone for the boop QR sticker */
+.preview-tag.format-five7 {
+  width: 220px;
+  height: 308px;
+  border-radius: 14px;
+  align-items: center;
+  text-align: center;
+  padding: 20px 16px;
+}
+.format-five7 .pv-brand { flex-direction: column; gap: 0.35rem; }
+.format-five7 .pv-callout {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  opacity: 1;
+}
+.format-five7.style-band .pv-callout {
+  align-self: center;
+  border-radius: 12px;
+  padding: 0.45rem 0.9rem;
+}
+.pv-sticker-wrap { display: none; }
+.format-five7 .pv-sticker-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+.pv-sticker-zone {
+  width: 88px;
+  height: 88px;
+  border: 1.5px dashed currentColor;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+.pv-qr-ghost { width: 58px; height: 58px; opacity: 0.3; }
+.pv-zone-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.format-five7 .pv-bottom .pv-qr { display: none; }
+.format-five7 .pv-bottom { justify-content: center; }
+.format-five7.style-split .pv-bottom {
+  margin: 0 -16px -20px;
+  padding: 10px 16px 12px;
+  border-radius: 0 0 13px 13px;
 }
 .preview-tag.format-tent::after {
   content: "";
