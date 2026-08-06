@@ -44,7 +44,10 @@
     cart[0].qty = packHint;
     saveCart();
   }
-  cart.forEach((i) => { i.qty = Math.min(500, Math.max(1, parseInt(i.qty, 10) || 1)); });
+  cart.forEach((i) => {
+    i.qty = Math.min(500, Math.max(1, parseInt(i.qty, 10) || 1));
+    if (i.format === "five7") i.singleSided = true; // displays are front-only
+  });
 
   // $29.99 per tag (tax included); every 4 tags bundle to $99.99.
   // Cents math to avoid float drift. Must match api/create-checkout.js,

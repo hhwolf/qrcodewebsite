@@ -85,35 +85,30 @@
       desc: "Turns happy customers into Google reviews at the counter.",
       thumbName: "Blue Door Salon", callout: "How did we do?",
       format: "five7", usecase: "review", bg: "#ffffff", accent: "#F59E0B", style: "classic",
-      back: { mode: "qr-text", text: "Scan to leave a review" },
     },
     {
       key: "social57", group: "cards57", label: "The Social Display",
       desc: "Instagram, Facebook, and TikTok — one scan to follow.",
       thumbName: "@cornercafe", callout: "See what's new here.",
       format: "five7", usecase: "instagram", bg: "#ffffff", accent: "#E01583", style: "classic",
-      back: { mode: "qr-text", text: "Scan to follow" },
     },
     {
       key: "pay57", group: "cards57", label: "The Payment Display",
       desc: "Checkout links straight in the browser — no app, no account.",
       thumbName: "Tips for Alex", callout: "Pay with your phone.",
       format: "five7", usecase: "pay", bg: "#ffffff", accent: "#1F8A63", style: "classic",
-      back: { mode: "qr-text", text: "Scan to pay or tip" },
     },
     {
       key: "wifi57", group: "cards57", label: "The Wi-Fi Display",
       desc: "Guest Wi-Fi with the password inside the code.",
       thumbName: "Studio K", callout: "Free wifi, no typing.",
       format: "five7", usecase: "wifi", bg: "#ffffff", accent: "#2563EB", style: "classic",
-      back: { mode: "qr-text", text: "Scan to join the Wi-Fi" },
     },
     {
       key: "menu57", group: "cards57", label: "The Menu Display",
       desc: "Your digital menu, always current — no reprints.",
       thumbName: "Café Norte", callout: "View our menu.",
       format: "five7", usecase: "menu", bg: "#ffffff", accent: "#5B21B6", style: "classic",
-      back: { mode: "qr-text", text: "Scan for today's menu" },
     },
 
     // --- Tags & stickers ---
@@ -221,7 +216,8 @@
   }
 
   function isSingleSided() {
-    return state.format === "sticker";
+    // Stickers have adhesive backs; framed 5×7 displays are front-only (for now).
+    return state.format === "sticker" || state.format === "five7";
   }
 
   function render() {
@@ -288,7 +284,7 @@
   function updateBackAvailability() {
     const single = isSingleSided();
     tabBack.disabled = single;
-    tabBack.title = single ? "Stickers are single-sided" : "";
+    tabBack.title = single ? "This format is single-sided" : "";
     backGroup.hidden = single;
     if (single) setView("front");
   }
