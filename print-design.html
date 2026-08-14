@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>boop — print file</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  /* Renders the customer's saved design at true print size and opens the
+     print dialog (choose "Save as PDF"). Cards print at 3.375in × 2.125in
+     (front + back pages); 5×7 displays print frameless at 5in × 7in. */
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Inter", sans-serif; background: #f2f4f8; }
+  .head-note {
+    font-size: 13px; color: #444; padding: 12px 16px; background: #fff;
+    border-bottom: 1px solid #ddd;
+  }
+  .head-note strong { font-family: "Space Grotesk", sans-serif; }
+  @media print { .head-note { display: none; } body { background: #fff; } }
+
+  .sheet {
+    background: var(--bg, #fff);
+    color: var(--fg, #14161c);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    page-break-after: always;
+    margin: 16px auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,.15);
+  }
+  @media print { .sheet { margin: 0; box-shadow: none; } }
+
+  /* ---------- 5×7 display ---------- */
+  .five7 { width: 5in; height: 7in; }
+  .band { display: flex; align-items: center; justify-content: space-between; height: 0.72in; padding: 0 0.42in; background: var(--accent); color: var(--accent-fg); }
+  .band-label { font-size: 10.5pt; font-weight: 700; letter-spacing: 0.22em; }
+  .band-dot { width: 0.17in; height: 0.17in; border-radius: 50%; background: var(--accent-fg); box-shadow: 0 0 0 0.045in color-mix(in srgb, var(--accent-fg), transparent 62%); }
+  .band-logo { max-height: 0.4in; max-width: 1.2in; object-fit: contain; }
+  .headline { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 32pt; line-height: 1.04; letter-spacing: -0.02em; padding: 0.32in 0.42in 0; overflow-wrap: anywhere; }
+  .sub { font-size: 10.5pt; line-height: 1.5; color: color-mix(in srgb, var(--fg), transparent 40%); padding: 0.12in 0.42in 0; max-width: 4.3in; }
+  .extra { flex-shrink: 0; padding: 0.16in 0.42in 0; }
+  .stars { color: var(--accent); font-size: 21pt; letter-spacing: 0.12em; line-height: 1; }
+  .extra-line { display: block; font-size: 11pt; margin-top: 0.08in; color: color-mix(in srgb, var(--fg), transparent 25%); }
+  .rule-line { font-size: 8pt; font-weight: 600; letter-spacing: 0.2em; color: color-mix(in srgb, var(--fg), transparent 45%); border-top: 1px solid color-mix(in srgb, var(--fg), transparent 75%); padding-top: 0.05in; margin-top: 0.1in; }
+  .rule-line.dotted { border-top-style: dotted; border-top-width: 2.4px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 0.08in; }
+  .chip { font-size: 8pt; font-weight: 700; letter-spacing: 0.1em; border: 1.4px solid var(--fg); border-radius: 999px; padding: 0.05in 0.14in; }
+  .row { margin-top: auto; display: flex; gap: 0.16in; align-items: stretch; padding: 0 0.42in; }
+  .qrbox { width: 2.55in; display: flex; flex-direction: column; border: 2px solid #14161c; background: #fff; color: #14161c; }
+  .qrbox-head { background: #14161c; color: #fff; font-size: 9pt; font-weight: 700; letter-spacing: 0.2em; text-align: center; padding: 0.07in 0.05in; }
+  .qrbox-body { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; min-height: 2in; }
+  .qrbox-body img { width: 1.75in; height: 1.75in; opacity: 0.1; }
+  .qr-note { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 9.5pt; font-weight: 600; letter-spacing: 0.12em; color: #9aa0ab; line-height: 1.6; }
+  .tappanel { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.05in; background: var(--accent); color: var(--accent-fg); border-radius: 0.13in; }
+  .tappanel svg { width: 0.55in; height: 0.55in; transform: rotate(90deg); margin-bottom: 0.06in; }
+  .tap-word { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 17pt; letter-spacing: 0.1em; }
+  .tap-hint { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.18em; }
+  .foot { display: flex; align-items: center; justify-content: space-between; margin: 0.18in 0.42in 0; padding: 0.1in 0 0.3in; border-top: 1.6px solid var(--fg); }
+  .foot-boop { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 11pt; }
+  .foot-name { font-size: 9pt; color: color-mix(in srgb, var(--fg), transparent 40%); }
+
+  /* ---------- Card (credit-card size) ---------- */
+  .card { width: 3.375in; height: 2.125in; padding: 0.16in; border-radius: 0.12in; justify-content: space-between; }
+  .card .brand { display: flex; align-items: center; gap: 0.1in; }
+  .card .brand img { max-height: 0.35in; max-width: 0.9in; object-fit: contain; }
+  .card .name { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 13pt; letter-spacing: -0.01em; }
+  .card .callout { font-size: 8pt; font-weight: 600; letter-spacing: 0.13em; text-transform: uppercase; opacity: 0.8; }
+  .card.style-band .callout { background: var(--accent); color: var(--accent-fg); padding: 0.05in 0.12in; border-radius: 999px; align-self: flex-start; opacity: 1; }
+  .card.style-frame { outline: 1.5px solid var(--accent); outline-offset: -0.09in; }
+  .card .bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+  .card .qr-slot { width: 0.62in; height: 0.62in; border: 1.2px dashed color-mix(in srgb, var(--fg), transparent 45%); border-radius: 0.06in; display: flex; align-items: center; justify-content: center; font-size: 4.6pt; font-weight: 700; letter-spacing: 0.08em; text-align: center; color: color-mix(in srgb, var(--fg), transparent 40%); }
+  .card .nfc { width: 0.28in; height: 0.28in; }
+  .card.back-face { align-items: center; justify-content: center; gap: 0.08in; text-align: center; }
+  .card.back-face .qr-slot { width: 0.95in; height: 0.95in; font-size: 6pt; }
+  .page-label { font-size: 10px; color: #888; text-align: center; margin-top: -8px; padding-bottom: 8px; }
+  @media print { .page-label { display: none; } }
+</style>
+</head>
+<body>
+<div class="head-note">
+  <strong>boop print file</strong> — File → Print → “Save as PDF”, at 100% scale / actual size.
+  The dashed area marks where the customer's QR code is applied.
+</div>
+<div id="out"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+
+  const NFC = (cls) => `<svg class="${cls}" viewBox="0 0 24 24" fill="none">
+    <path d="M6 9c1.5 1.8 1.5 4.2 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M10 6.5c2.6 3.2 2.6 7.8 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".65"/>
+    <path d="M14 4c3.8 4.6 3.8 11.4 0 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/></svg>`;
+
+  const DEMOS = {
+    five7: {
+      format: "five7", usecase: "review", bg: "#ffffff", fg: "#14161c",
+      accent: "#F5A623", accentFg: "#14161c", callout: "How did we do?",
+      posterLabel: "THIRTY SECONDS, TOPS",
+      posterSub: "A review on Google helps a small shop more than almost anything else. Thank you.",
+      scanLabel: "SCAN TO REVIEW", name: "Blue Door Salon",
+    },
+    card: {
+      format: "card", usecase: "bizcard", bg: "#ffffff", fg: "#14161c",
+      accent: "#2563EB", accentFg: "#ffffff", style: "frame",
+      callout: "Tap for my card", backCallout: "Scan to save my contact",
+      name: "Jordan Lee", singleSided: false,
+    },
+  };
+
+  let design = null;
+  const demo = new URLSearchParams(location.search).get("demo");
+  if (demo && DEMOS[demo]) design = DEMOS[demo];
+  else {
+    try { design = JSON.parse(localStorage.getItem("boopPrintDesign")); } catch (e) { /* noop */ }
+  }
+
+  const out = document.getElementById("out");
+  if (!design || !design.format) {
+    out.innerHTML = '<p style="padding:2rem">No design found — go back to <a href="/checkout">checkout</a> and use a “Save print PDF” button.</p>';
+    return;
+  }
+
+  const isFive7 = design.format === "five7";
+  const size = isFive7 ? "5in 7in" : "3.375in 2.125in";
+  const style = document.createElement("style");
+  style.textContent = `@page { size: ${size}; margin: 0; }`;
+  document.head.appendChild(style);
+
+  function posterExtra(o) {
+    if (o.posterTags) {
+      const items = String(o.posterTags).split(",").map((t) => t.trim()).filter(Boolean).slice(0, 4);
+      return `<div class="chips">${items.map((t) => `<span class="chip">${esc(t.toUpperCase())}</span>`).join("")}</div>`;
+    }
+    const u = o.usecase;
+    if (u === "review") return `<span class="stars">★★★★★</span><span class="extra-line">Leave a review on <strong>Google</strong></span>`;
+    if (u === "wifi") return `<div class="rule-line">NETWORK</div><div class="rule-line">PASSWORD</div>`;
+    if (u === "instagram") return `<div class="chips"><span class="chip">INSTAGRAM</span><span class="chip">FACEBOOK</span><span class="chip">TIKTOK</span></div>`;
+    if (u === "pay") return `<div class="chips"><span class="chip">APPLE PAY</span><span class="chip">GOOGLE PAY</span><span class="chip">CARD</span></div>`;
+    if (u === "menu") return `<div class="rule-line dotted">STARTERS</div><div class="rule-line dotted">MAINS</div><div class="rule-line dotted">DRINKS</div>`;
+    return "";
+  }
+
+  const vars = `--bg:${design.bg};--fg:${design.fg};--accent:${design.accent};--accent-fg:${design.accentFg}`;
+
+  if (isFive7) {
+    const bandRight = design.logo
+      ? `<img class="band-logo" src="${design.logo}" alt="" />`
+      : `<span class="band-dot"></span>`;
+    out.innerHTML = `
+      <div class="sheet five7" style="${vars}">
+        <div class="band"><span class="band-label">${esc(design.posterLabel || "TAP OR SCAN")}</span>${bandRight}</div>
+        <div class="headline">${esc(design.callout)}</div>
+        <p class="sub">${esc(design.posterSub || "")}</p>
+        <div class="extra">${posterExtra(design)}</div>
+        <div class="row">
+          <div class="qrbox">
+            <div class="qrbox-head">${esc(design.scanLabel || "SCAN ME")}</div>
+            <div class="qrbox-body"><img src="assets/sample-qr.svg" alt="" /><span class="qr-note">QR CODE<br />GOES HERE</span></div>
+          </div>
+          <div class="tappanel">${NFC("")}
+            <span class="tap-word">TAP</span><span class="tap-hint">HOLD PHONE HERE</span>
+          </div>
+        </div>
+        <div class="foot"><span class="foot-boop">boop</span><span class="foot-name">${esc(design.name || "")}</span></div>
+      </div>`;
+  } else {
+    const logo = design.logo ? `<img src="${design.logo}" alt="" />` : "";
+    const front = `
+      <div class="sheet card style-${esc(design.style || "classic")}" style="${vars}">
+        <div class="brand">${logo}<span class="name">${esc(design.name || "")}</span></div>
+        <span class="callout">${esc(design.callout || "")}</span>
+        <div class="bottom">
+          <span class="qr-slot">QR<br />HERE</span>
+          ${NFC("nfc")}
+        </div>
+      </div>
+      <p class="page-label">Front</p>`;
+    const back = design.singleSided ? "" : `
+      <div class="sheet card back-face" style="${vars}">
+        <span class="name">${esc(design.name || "")}</span>
+        <span class="qr-slot">QR CODE<br />GOES HERE</span>
+        <span class="callout">${esc(design.backCallout || "")}</span>
+      </div>
+      <p class="page-label">Back</p>`;
+    out.innerHTML = front + back;
+  }
+
+  // Give fonts/images a beat to load, then open the print dialog.
+  if (!new URLSearchParams(location.search).get("noprint")) {
+    window.addEventListener("load", () => setTimeout(() => window.print(), 700));
+  }
+})();
+</script>
+</body>
+</html>

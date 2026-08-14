@@ -109,6 +109,12 @@
     return "";
   }
 
+  function chipsMarkup(tags) {
+    const items = String(tags).split(",").map((t) => t.trim()).filter(Boolean).slice(0, 4);
+    if (!items.length) return "";
+    return `<span class="pv-chips">${items.map((t) => `<span>${esc(t.toUpperCase())}</span>`).join("")}</span>`;
+  }
+
   function frontFace(o) {
     const logo = o.logo ? `<img class="co-logo" src="${o.logo}" alt="" />` : "";
     const vars = `--pv-bg:${o.bg};--pv-fg:${o.fg};--pv-accent:${o.accent};--pv-accent-fg:${o.accentFg}`;
@@ -121,7 +127,7 @@
           <span class="pv-poster-band"><span class="pv-poster-label">${esc(o.posterLabel || "TAP OR SCAN")}</span>${bandRight}</span>
           <span class="pv-callout">${esc(o.callout)}</span>
           <span class="pv-poster-sub">${esc(o.posterSub || "")}</span>
-          <span class="pv-poster-extra">${posterExtra(o.usecase)}</span>
+          <span class="pv-poster-extra">${o.posterTags ? chipsMarkup(o.posterTags) : posterExtra(o.usecase)}</span>
           <span class="pv-poster-row">
             <span class="pv-qrbox"><span class="pv-qrbox-head">${esc(o.scanLabel || "SCAN ME")}</span><img class="pv-qrbox-img" src="assets/sample-qr.svg" alt="" /></span>
             <span class="pv-tappanel">${NFC_SVG.replace("pv-nfc", "pv-tappanel-nfc")}<span class="pv-tappanel-tap">TAP</span><span class="pv-tappanel-hint">HOLD PHONE HERE</span></span>
@@ -168,7 +174,8 @@
       .map(
         (o, i) => `
         <div class="co-design">
-          <p class="co-design-title">${esc(itemTitle(o, i))}</p>
+          <p class="co-design-title">${esc(itemTitle(o, i))}
+            <button type="button" class="co-print" data-print="${i}">Save print PDF</button></p>
           <div class="co-face"><span class="co-face-label">Front</span>${frontFace(o)}</div>
           ${o.singleSided ? "" : `<div class="co-face"><span class="co-face-label">Back</span>${backFace(o)}</div>`}
         </div>`
@@ -194,6 +201,19 @@
       )
       .join("");
   }
+
+  faces.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-print]");
+    if (!btn) return;
+    const design = cart[parseInt(btn.dataset.print, 10)];
+    if (!design) return;
+    try {
+      localStorage.setItem("boopPrintDesign", JSON.stringify(design));
+    } catch (err) {
+      localStorage.setItem("boopPrintDesign", JSON.stringify({ ...design, logo: null }));
+    }
+    window.open("/print-design", "_blank");
+  });
 
   packList.addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-act]");

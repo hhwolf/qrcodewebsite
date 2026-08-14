@@ -61,6 +61,18 @@
     custom: { label: "TAP OR SCAN", sub: "Tap your phone on the panel, or scan the code. It takes seconds.", scan: "SCAN ME" },
   };
 
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    }[c]));
+  }
+
+  function chipsMarkup(tags) {
+    const items = tags.split(",").map((t) => t.trim()).filter(Boolean).slice(0, 4);
+    if (!items.length) return "";
+    return `<span class="pv-chips">${items.map((t) => `<span>${esc(t.toUpperCase())}</span>`).join("")}</span>`;
+  }
+
   function posterExtra(usecase) {
     if (usecase === "review") {
       return `<span class="pv-stars">★★★★★</span><span class="pv-extra-line">Leave a review on <strong>Google</strong></span>`;
@@ -117,7 +129,37 @@
       format: "five7", usecase: "menu", bg: "#ffffff", accent: "#5B21B6", style: "classic",
     },
 
-    // --- Tags & stickers ---
+    // --- Cards & stickers ---
+    {
+      key: "nightshift", label: "The Night Shift", desc: "Settle tabs and tips at the bar, cash-free.",
+      thumbName: "Night Shift Bar", callout: "Tap to settle up",
+      format: "card", usecase: "pay", bg: "#0A0F1E", accent: "#22D3EE", style: "band",
+      back: { mode: "qr-text", text: "Scan to pay or tip" },
+    },
+    {
+      key: "regular", label: "The Regular", desc: "A warm little menu card for the counter.",
+      thumbName: "Café Norte", callout: "Tap for the menu",
+      format: "card", usecase: "menu", bg: "#FAF3E7", accent: "#C4532D", style: "band",
+      back: { mode: "qr-text", text: "Scan for today's menu" },
+    },
+    {
+      key: "plug", label: "The Plug", desc: "Your socials on a clean framed card.",
+      thumbName: "@studiok", callout: "Follow the studio",
+      format: "card", usecase: "instagram", bg: "#ffffff", accent: "#5B21B6", style: "frame",
+      back: { mode: "qr-text", text: "Scan to follow" },
+    },
+    {
+      key: "referral", label: "The Referral", desc: "Happy customers send their friends your way.",
+      thumbName: "Pleasant Smiles", callout: "Tap to refer a friend",
+      format: "card", usecase: "custom", bg: "#2563EB", accent: "#22D3EE", style: "band",
+      back: { mode: "qr-text", text: "Scan to refer a friend" },
+    },
+    {
+      key: "concierge", label: "The Concierge", desc: "One card for everything — links, hours, house rules.",
+      thumbName: "Hotel Aurora", callout: "Tap for everything",
+      format: "card", usecase: "custom", bg: "#0A0F1E", accent: "#F59E0B", style: "split",
+      back: { mode: "qr-text", text: "Tap or scan" },
+    },
     {
       key: "tipjar", soldOut: true, label: "The Tip Jar", desc: "Cash-free tips for counters, cases, and stages.",
       thumbName: "Tips for Alex", callout: "Tap to tip",
@@ -179,6 +221,9 @@
     back: "qr-text",
     backText: "",
     customText: "",
+    posterLabelText: "",
+    posterSubText: "",
+    posterTags: "",
     calloutOverride: null,
     backTextOverride: null,
     templateLabel: null,
@@ -213,7 +258,8 @@
   }
 
   function calloutText() {
-    if (state.usecase === "custom") return state.customText || CALLOUTS.custom;
+    if (state.customText) return state.customText;
+    if (state.usecase === "custom") return CALLOUTS.custom;
     return state.calloutOverride || CALLOUTS[state.usecase];
   }
 
@@ -247,11 +293,13 @@
 
     // Poster elements (only visible in the five7 format)
     const poster = POSTER[state.usecase] || POSTER.custom;
-    document.getElementById("pv-poster-label").textContent = poster.label;
-    document.getElementById("pv-poster-sub").textContent = poster.sub;
+    document.getElementById("pv-poster-label").textContent = state.posterLabelText || poster.label;
+    document.getElementById("pv-poster-sub").textContent = state.posterSubText || poster.sub;
     document.getElementById("pv-scan-label").textContent = poster.scan;
-    document.getElementById("pv-poster-extra").innerHTML = posterExtra(state.usecase);
+    document.getElementById("pv-poster-extra").innerHTML =
+      state.posterTags ? chipsMarkup(state.posterTags) : posterExtra(state.usecase);
     document.getElementById("pv-poster-name").textContent = state.name || "";
+    customText.placeholder = state.usecase === "custom" ? "e.g. Tap for our playlist" : CALLOUTS[state.usecase];
 
     const posterLogo = document.getElementById("pv-poster-logo");
     const posterDot = document.getElementById("pv-poster-dot");
@@ -382,8 +430,15 @@
     state.accent = t.accent;
     state.color = "custom";
     customColor.value = t.bg;
-    state.calloutOverride = t.callout || null;
-    state.customText = "";
+    state.calloutOverride = t.usecase === "custom" ? null : t.callout || null;
+    state.customText = t.usecase === "custom" ? t.callout || "" : "";
+    customText.value = state.customText;
+    state.posterLabelText = "";
+    state.posterSubText = "";
+    state.posterTags = "";
+    posterLabelInput.value = "";
+    posterSubInput.value = "";
+    posterTagsInput.value = "";
     state.back = t.back ? t.back.mode : "qr-text";
     state.backTextOverride = t.back ? t.back.text || null : null;
     state.backText = "";
@@ -396,8 +451,8 @@
     setRadio("accent", t.accent);
     setRadio("back", state.back);
     setRadio("color", "custom");
-    customWrap.hidden = true;
     updateAccentVisibility();
+    updatePosterVisibility();
     backTextWrap.hidden = state.back !== "qr-text";
     updateBackAvailability();
     setView("front");
@@ -424,6 +479,7 @@
       state.format = checked("format");
       updateBackAvailability();
       updateAccentVisibility();
+      updatePosterVisibility();
       deselectTemplates();
       render();
     })
@@ -434,14 +490,36 @@
       state.usecase = checked("usecase");
       state.calloutOverride = null;
       state.backTextOverride = null;
-      customWrap.hidden = state.usecase !== "custom";
-      if (state.usecase === "custom") customText.focus();
+      state.customText = "";
+      customText.value = "";
       deselectTemplates();
       render();
     })
   );
   customText.addEventListener("input", () => {
     state.customText = customText.value.trim();
+    render();
+  });
+
+  const posterWrap = document.getElementById("poster-wrap");
+  const posterLabelInput = document.getElementById("poster-label");
+  const posterSubInput = document.getElementById("poster-sub");
+  const posterTagsInput = document.getElementById("poster-tags");
+
+  function updatePosterVisibility() {
+    posterWrap.hidden = state.format !== "five7";
+  }
+
+  posterLabelInput.addEventListener("input", () => {
+    state.posterLabelText = posterLabelInput.value.trim();
+    render();
+  });
+  posterSubInput.addEventListener("input", () => {
+    state.posterSubText = posterSubInput.value.trim();
+    render();
+  });
+  posterTagsInput.addEventListener("input", () => {
+    state.posterTags = posterTagsInput.value.trim();
     render();
   });
 
@@ -545,6 +623,12 @@
     state.backTextOverride = null;
     customText.value = "";
     backText.value = "";
+    state.posterLabelText = "";
+    state.posterSubText = "";
+    state.posterTags = "";
+    posterLabelInput.value = "";
+    posterSubInput.value = "";
+    posterTagsInput.value = "";
 
     setRadio("format", "card");
     setRadio("usecase", "custom");
@@ -552,8 +636,8 @@
     setRadio("style", "classic");
     setRadio("accent", "#2563EB");
     setRadio("back", "qr-text");
-    customWrap.hidden = false;
     updateAccentVisibility();
+    updatePosterVisibility();
     backTextWrap.hidden = false;
 
     deselectTemplates();
@@ -586,8 +670,9 @@
       name: state.name || "Your Business",
       logo: state.logo,
       templateLabel: state.templateLabel,
-      posterLabel: (POSTER[state.usecase] || POSTER.custom).label,
-      posterSub: (POSTER[state.usecase] || POSTER.custom).sub,
+      posterLabel: state.posterLabelText || (POSTER[state.usecase] || POSTER.custom).label,
+      posterSub: state.posterSubText || (POSTER[state.usecase] || POSTER.custom).sub,
+      posterTags: state.posterTags,
       scanLabel: (POSTER[state.usecase] || POSTER.custom).scan,
       qty: 1,
     };

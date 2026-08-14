@@ -52,7 +52,7 @@
           <!-- Template cards are rendered by customize.js from the TEMPLATES list -->
         </div>
 
-        <h3 class="tpl-group-title">Tags &amp; stickers</h3>
+        <h3 class="tpl-group-title">Cards &amp; stickers</h3>
         <div class="tpl-grid" id="tpl-grid">
           <!-- Template cards are rendered by customize.js from the TEMPLATES list -->
         </div>
@@ -174,9 +174,17 @@
               <label class="pill"><input type="radio" name="usecase" value="instagram" /><span>Instagram</span></label>
               <label class="pill"><input type="radio" name="usecase" value="custom" /><span>Custom link</span></label>
             </div>
-            <div class="opt-sub" id="custom-callout-wrap" hidden>
-              <label class="field-label" for="custom-callout">Tag text</label>
-              <input type="text" id="custom-callout" maxlength="28" placeholder="e.g. Tap for our playlist" />
+            <div class="opt-sub" id="custom-callout-wrap">
+              <label class="field-label" for="custom-callout">Front text (optional — overrides the default)</label>
+              <input type="text" id="custom-callout" maxlength="40" placeholder="e.g. Tap for our playlist" />
+            </div>
+            <div class="opt-sub" id="poster-wrap" hidden>
+              <label class="field-label" for="poster-label">Display tagline (top band)</label>
+              <input type="text" id="poster-label" maxlength="26" placeholder="e.g. FOLLOW ALONG" />
+              <label class="field-label" for="poster-sub">Display subline</label>
+              <input type="text" id="poster-sub" maxlength="90" placeholder="Short supporting line under the headline" />
+              <label class="field-label" for="poster-tags">Company / social tags (comma-separated)</label>
+              <input type="text" id="poster-tags" maxlength="70" placeholder="e.g. @cornercafe, Corner Café Co." />
             </div>
           </div>
 
