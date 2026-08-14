@@ -1461,12 +1461,8 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
 /* ============================================================
    Checkout page
    ============================================================ */
-.checkout { background: var(--paper); padding: 3.5rem 0 5.5rem; min-height: 60vh; }
-.co-title {
-  font-size: clamp(1.9rem, 4vw, 2.6rem);
-  letter-spacing: -0.02em;
-  margin-bottom: 2rem;
-}
+.checkout { background: var(--paper); padding: 3rem 0 5.5rem; min-height: 50vh; }
+.co-hero { padding: 3rem 0 3.5rem; }
 .co-empty {
   background: var(--white);
   border: 1px solid var(--line);
@@ -1577,6 +1573,69 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
   cursor: pointer;
   padding: 0.3rem 0.4rem;
 }
+.pack-dot {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--dot, #fff);
+  border: 1px solid rgba(10, 15, 30, 0.15);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dot-ring, var(--blue)), transparent 60%);
+}
+
+/* Checkout polish */
+.price-box {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+}
+.price-box .qty-hint { margin-top: 0.8rem; }
+.price-line-total { color: var(--blue); }
+.btn-pay {
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  padding: 1rem 1.5rem;
+  font-size: 1.02rem;
+  border-radius: 14px;
+}
+.pay-badges {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+}
+.pay-badges span {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 0.22rem 0.5rem;
+  background: var(--white);
+}
+.co-benefits {
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 1rem 0 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.co-benefits li {
+  font-size: 0.85rem;
+  color: var(--muted);
+  padding-left: 1.5rem;
+  position: relative;
+}
+.co-benefits li::before {
+  content: "✓";
+  position: absolute;
+  left: 0.2rem;
+  color: var(--blue);
+  font-weight: 700;
+}
 .co-design { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
 .co-design + .co-design { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid var(--line); }
 .co-design-title {
@@ -1623,6 +1682,35 @@ h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
   color: var(--muted);
   text-align: center;
 }
+
+/* Sold-out states */
+.pill-soldout {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.pill-soldout:hover { border-color: var(--line); color: var(--muted); }
+.tpl-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.tpl-card:disabled:hover { border-color: var(--line); transform: none; box-shadow: none; }
+.tpl-badge-soldout {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b42318;
+  background: #fdf1f0;
+  border: 1px solid #f0c8c4;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+.tpl-card { position: relative; }
 
 /* Success state */
 .co-success { text-align: center; padding: 1rem 0; }

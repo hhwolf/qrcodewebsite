@@ -119,7 +119,7 @@
 
     // --- Tags & stickers ---
     {
-      key: "tipjar", label: "The Tip Jar", desc: "Cash-free tips for counters, cases, and stages.",
+      key: "tipjar", soldOut: true, label: "The Tip Jar", desc: "Cash-free tips for counters, cases, and stages.",
       thumbName: "Tips for Alex", callout: "Tap to tip",
       format: "sticker", usecase: "pay", bg: "#0A0F1E", accent: "#22D3EE", style: "band",
     },
@@ -130,7 +130,7 @@
       back: { mode: "qr-text", text: "Scan to save my contact" },
     },
     {
-      key: "fivestar", label: "The Five-Star", desc: "Turn happy customers into Google reviews.",
+      key: "fivestar", soldOut: true, label: "The Five-Star", desc: "Turn happy customers into Google reviews.",
       thumbName: "Blue Door Salon", callout: "★★★★★ Tap to review",
       format: "sticker", usecase: "review", bg: "#ffffff", accent: "#F59E0B", style: "band",
     },
@@ -141,7 +141,7 @@
       back: { mode: "qr-text", text: "Scan to join the Wi-Fi" },
     },
     {
-      key: "maincharacter", label: "The Main Character", desc: "Grow your following in real life.",
+      key: "maincharacter", soldOut: true, label: "The Main Character", desc: "Grow your following in real life.",
       thumbName: "@cornercafe", callout: "Follow us on Instagram",
       format: "sticker", usecase: "instagram", bg: "#7C3AED", accent: "#22D3EE", style: "band",
     },
@@ -353,7 +353,8 @@
            <span class="tpl-badge">2-sided · hover to flip</span>
          </span>`
       : `<span class="tpl-thumb">${frontFaceMarkup(t)}</span>`;
-    return `${thumb}
+    const badge = t.soldOut ? `<span class="tpl-badge tpl-badge-soldout">Sold out</span>` : "";
+    return `${badge}${thumb}
       <span class="tpl-label">${t.label}</span>
       <span class="tpl-desc">${t.desc}</span>`;
   }
@@ -412,7 +413,8 @@
     button.className = "tpl-card";
     button.setAttribute("aria-pressed", "false");
     button.innerHTML = thumbMarkup(t);
-    button.addEventListener("click", () => applyTemplate(t, button));
+    if (t.soldOut) button.disabled = true;
+    else button.addEventListener("click", () => applyTemplate(t, button));
     (tplGrids[t.group] || tplGrids.tags).appendChild(button);
   });
 

@@ -29,9 +29,15 @@
     }
   }
 
-  const cart = loadCart();
+  const loaded = loadCart();
+  const cart = loaded.filter((i) => i.format !== "sticker"); // stickers are sold out
+  const droppedSoldOut = loaded.length !== cart.length;
   if (!cart.length) {
     empty.hidden = false;
+    if (droppedSoldOut) {
+      empty.querySelector("p").textContent =
+        "Stickers are currently sold out, so your pack is empty — design a card or 5×7 display instead.";
+    }
     return;
   }
   content.hidden = false;
@@ -173,6 +179,7 @@
       .map(
         (o, i) => `
         <div class="pack-row" data-i="${i}">
+          <span class="pack-dot" style="--dot:${o.bg};--dot-ring:${o.accent}"></span>
           <div class="pack-row-info">
             <strong>${esc(itemTitle(o, i))}</strong>
             <span>${esc(itemDetail(o))}</span>
@@ -248,6 +255,11 @@
 
   renderPack();
   updateTotals();
+  if (droppedSoldOut) {
+    saveCart();
+    document.getElementById("pay-msg").textContent =
+      "Heads up: stickers are sold out and were removed from your pack.";
+  }
 
   // ---------- Stripe Checkout ----------
   const form = document.getElementById("pay-form");

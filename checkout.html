@@ -20,10 +20,17 @@
     </div>
   </header>
 
-  <main class="checkout">
-    <div class="container">
-      <h1 class="co-title">Checkout</h1>
+  <main>
+    <section class="customize-hero co-hero">
+      <div class="container">
+        <p class="eyebrow">Secure checkout</p>
+        <h1>Almost boop time.</h1>
+        <p class="sub">Review your pack, pick quantities, and pay securely with Stripe.</p>
+      </div>
+    </section>
 
+    <section class="checkout">
+    <div class="container">
       <div class="co-empty" id="co-empty" hidden>
         <p>You haven't designed a boop yet.</p>
         <a class="btn" href="/customize">Start designing</a>
@@ -48,25 +55,34 @@
 
           <div class="opt-group">
             <h3 class="opt-title">Total</h3>
-            <div class="price-lines">
-              <div class="price-line"><span>Subtotal</span><span id="subtotal"></span></div>
-              <div class="price-line" id="discount-line" hidden><span>4-pack bundle savings</span><span id="discount"></span></div>
-              <div class="price-line"><span>Shipping</span><span>$10 — or free pickup, chosen at payment</span></div>
-              <div class="price-line price-line-total"><span>Total before shipping</span><span id="total"></span></div>
+            <div class="price-box">
+              <div class="price-lines">
+                <div class="price-line"><span>Subtotal</span><span id="subtotal"></span></div>
+                <div class="price-line" id="discount-line" hidden><span>4-pack bundle savings</span><span id="discount"></span></div>
+                <div class="price-line"><span>Shipping</span><span>$10 — or free pickup</span></div>
+                <div class="price-line price-line-total"><span>Total before shipping</span><span id="total"></span></div>
+              </div>
+              <p class="qty-hint">Tax included. Shipping is chosen on the payment page.</p>
             </div>
-            <p class="qty-hint">Tax included.</p>
           </div>
 
           <div class="opt-group opt-group-submit">
-            <p class="opt-note">You'll enter your card, email, and shipping address on Stripe's secure payment page. Apple&nbsp;Pay and Google&nbsp;Pay supported.</p>
-            <button type="submit" class="btn btn-wide" id="pay-btn">Pay with Stripe</button>
-            <p class="stripe-note">🔒 Secure checkout powered by <strong>Stripe</strong> — we never see your card details.</p>
+            <button type="submit" class="btn btn-wide btn-pay" id="pay-btn">Pay with Stripe</button>
+            <div class="pay-badges" aria-hidden="true">
+              <span>VISA</span><span>MASTERCARD</span><span>AMEX</span><span> Pay</span><span>G Pay</span>
+            </div>
+            <ul class="co-benefits">
+              <li>Free design proof by email before anything prints</li>
+              <li>Ships in 5–7 business days, or free local pickup</li>
+              <li>Secure payment via Stripe — we never see your card</li>
+            </ul>
             <p class="form-msg form-msg-light" id="pay-msg" role="status"></p>
           </div>
         </form>
 
       </div>
     </div>
+    </section>
   </main>
 
   <footer class="footer">

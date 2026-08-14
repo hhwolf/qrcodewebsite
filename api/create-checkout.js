@@ -7,7 +7,7 @@
 const UNIT_AMOUNT = 2999; // cents
 const BUNDLE_SIZE = 4;
 const BUNDLE_AMOUNT = 9999; // cents, per 4-pack
-const FORMATS = ["card", "sticker", "five7"];
+const FORMATS = ["card", "five7"]; // stickers are sold out
 const FORMAT_LABELS = {
   card: "Card", sticker: "Sticker", five7: "5×7 counter display (framed)",
 };
